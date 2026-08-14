@@ -4,11 +4,25 @@
 
   const html = await response.text();
   const mainScript = '<script src="sidepanel.js"></script>';
-  if (!html.includes(mainScript)) throw new Error('sidepanel.js script tag not found');
+  const headClose = '</head>';
 
-  const patchedHtml = html.replace(
+  if (!html.includes(mainScript)) throw new Error('sidepanel.js script tag not found');
+  if (!html.includes(headClose)) throw new Error('head closing tag not found');
+
+  const withMaintenanceStyle = html.replace(
+    headClose,
+    '  <link rel="stylesheet" href="sidepanel-maintenance.css">\n</head>'
+  );
+
+  const maintenanceScripts = [
+    '<script src="sidepanel-model.js"></script>',
+    '<script src="sidepanel-runtime.js"></script>',
+    '<script src="sidepanel-ui-cleanup.js"></script>'
+  ].join('\n');
+
+  const patchedHtml = withMaintenanceStyle.replace(
     mainScript,
-    `${mainScript}\n<script src="sidepanel-enter-fix.js"></script>`
+    `${mainScript}\n${maintenanceScripts}`
   );
 
   document.open();
