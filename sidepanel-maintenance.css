@@ -22,12 +22,6 @@
   --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px rgba(37, 99, 235, .55);
 }
 
-.menu-toggle,
-.action-buttons,
-.footer-menu-wrapper {
-  display: none !important;
-}
-
 .row-actions {
   gap: 0;
   min-width: 28px;
@@ -73,12 +67,6 @@ button:focus-visible,
 .item-note:focus-visible,
 .text-editor-area:focus-visible {
   border-radius: 3px;
-}
-
-#editor.is-rendering .row,
-#editor.is-rendering .item-input,
-#editor.is-rendering .item-note {
-  transition: none !important;
 }
 
 @media (pointer: coarse) {
