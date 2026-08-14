@@ -7,48 +7,80 @@
   let saveInFlight = Promise.resolve();
   let pendingSaveWaiters = [];
 
-  function settleSaveWaiters(error = null) {
-    const waiters = pendingSaveWaiters;
-    pendingSaveWaiters = [];
+  function resolveWaiters(waiters, error = null) {
     waiters.forEach(({ resolve, reject }) => error ? reject(error) : resolve());
   }
 
-  if (typeof saveData === 'function') {
-    const baseSaveData = saveData;
+  function scheduleFlush() {
+    if (saveTimer !== null) clearTimeout(saveTimer);
+    saveTimer = window.setTimeout(() => {
+      flushSaveData().catch((error) => console.error('Debounced save failed:', error));
+    }, SAVE_DEBOUNCE_MS);
+  }
 
-    async function flushSaveData() {
-      if (saveTimer !== null) {
-        clearTimeout(saveTimer);
-        saveTimer = null;
-      }
+  async function persistSnapshot() {
+    maintenance.normalizeState?.();
 
-      maintenance.normalizeState?.();
-      saveInFlight = saveInFlight.then(() => baseSaveData());
+    const tabsSnapshot = JSON.stringify(tabs);
+    const activeTabSnapshot = activeTabId;
+    updateSaveStatus('saving');
 
-      try {
-        await saveInFlight;
-        settleSaveWaiters();
-      } catch (error) {
-        settleSaveWaiters(error);
-        throw error;
-      }
+    await chrome.storage.local.set({
+      tabs: tabsSnapshot,
+      activeTabId: activeTabSnapshot
+    });
+
+    lastSavedTabsJSON = tabsSnapshot;
+
+    const stateStillMatches =
+      JSON.stringify(tabs) === tabsSnapshot &&
+      activeTabId === activeTabSnapshot;
+
+    isDirty = !stateStillMatches;
+    updateSaveStatus(isDirty ? 'dirty' : 'saved');
+
+    if (isDirty && saveTimer === null) scheduleFlush();
+  }
+
+  async function flushSaveData() {
+    if (saveTimer !== null) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
     }
 
+    if (!isDirty && Array.isArray(tabs) && tabs.length > 0) {
+      const waiters = pendingSaveWaiters.splice(0);
+      resolveWaiters(waiters);
+      return;
+    }
+
+    const waiters = pendingSaveWaiters.splice(0);
+    saveInFlight = saveInFlight
+      .catch(() => {})
+      .then(() => persistSnapshot());
+
+    try {
+      await saveInFlight;
+      resolveWaiters(waiters);
+    } catch (error) {
+      isDirty = true;
+      updateSaveStatus('error');
+      resolveWaiters(waiters, error);
+      throw error;
+    }
+  }
+
+  if (typeof saveData === 'function') {
     saveData = function debouncedSaveData() {
       if (!isDirty && Array.isArray(tabs) && tabs.length > 0) {
         return Promise.resolve();
       }
 
-      if (saveTimer !== null) clearTimeout(saveTimer);
-
       const promise = new Promise((resolve, reject) => {
         pendingSaveWaiters.push({ resolve, reject });
       });
 
-      saveTimer = window.setTimeout(() => {
-        flushSaveData().catch((error) => console.error('Debounced save failed:', error));
-      }, SAVE_DEBOUNCE_MS);
-
+      scheduleFlush();
       return promise;
     };
 
@@ -71,9 +103,13 @@
       if (saveTimer !== null) {
         clearTimeout(saveTimer);
         saveTimer = null;
-        settleSaveWaiters();
       }
-      return baseForceReload.apply(this, args);
+      const waiters = pendingSaveWaiters.splice(0);
+      resolveWaiters(waiters);
+
+      const result = await baseForceReload.apply(this, args);
+      if (isDirty && saveTimer === null) scheduleFlush();
+      return result;
     };
   }
 
