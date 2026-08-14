@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.0.7",
-  "description": "タブ切り替え・装飾・行番号ジャンプ・日時表示・詳細連動移動・1行自動縮小表示・太字行の改行継承対応の多機能メモツール",
+  "version": "2.1.0",
+  "description": "タブ切り替え・装飾・行番号ジャンプ・日時表示・詳細連動移動・1行自動縮小表示に対応したメモツール。内部安定性改善・三点メニュー撤去済み。",
   "permissions": [
     "sidePanel",
     "storage",
