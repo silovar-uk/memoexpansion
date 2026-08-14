@@ -20,7 +20,6 @@
 
   async function persistSnapshot() {
     maintenance.normalizeState?.();
-
     const tabsSnapshot = JSON.stringify(tabs);
     const activeTabSnapshot = activeTabId;
     updateSaveStatus('saving');
@@ -31,14 +30,9 @@
     });
 
     lastSavedTabsJSON = tabsSnapshot;
-
-    const stateStillMatches =
-      JSON.stringify(tabs) === tabsSnapshot &&
-      activeTabId === activeTabSnapshot;
-
+    const stateStillMatches = JSON.stringify(tabs) === tabsSnapshot && activeTabId === activeTabSnapshot;
     isDirty = !stateStillMatches;
     updateSaveStatus(isDirty ? 'dirty' : 'saved');
-
     if (isDirty && saveTimer === null) scheduleFlush();
   }
 
@@ -47,18 +41,12 @@
       clearTimeout(saveTimer);
       saveTimer = null;
     }
-
     if (!isDirty && Array.isArray(tabs) && tabs.length > 0) {
-      const waiters = pendingSaveWaiters.splice(0);
-      resolveWaiters(waiters);
+      resolveWaiters(pendingSaveWaiters.splice(0));
       return;
     }
-
     const waiters = pendingSaveWaiters.splice(0);
-    saveInFlight = saveInFlight
-      .catch(() => {})
-      .then(() => persistSnapshot());
-
+    saveInFlight = saveInFlight.catch(() => {}).then(() => persistSnapshot());
     try {
       await saveInFlight;
       resolveWaiters(waiters);
@@ -72,89 +60,20 @@
 
   if (typeof saveData === 'function') {
     saveData = function debouncedSaveData() {
-      if (!isDirty && Array.isArray(tabs) && tabs.length > 0) {
-        return Promise.resolve();
-      }
-
-      const promise = new Promise((resolve, reject) => {
-        pendingSaveWaiters.push({ resolve, reject });
-      });
-
+      if (!isDirty && Array.isArray(tabs) && tabs.length > 0) return Promise.resolve();
+      const promise = new Promise((resolve, reject) => pendingSaveWaiters.push({ resolve, reject }));
       scheduleFlush();
       return promise;
     };
 
     maintenance.flushSaveData = flushSaveData;
-
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden' && isDirty) {
         flushSaveData().catch((error) => console.error('Visibility save failed:', error));
       }
     });
-
     window.addEventListener('pagehide', () => {
       if (isDirty) flushSaveData().catch(() => {});
     });
-  }
-
-  if (typeof forceReload === 'function') {
-    const baseForceReload = forceReload;
-    forceReload = async function safeForceReload(...args) {
-      if (saveTimer !== null) {
-        clearTimeout(saveTimer);
-        saveTimer = null;
-      }
-      const waiters = pendingSaveWaiters.splice(0);
-      resolveWaiters(waiters);
-
-      const result = await baseForceReload.apply(this, args);
-      if (isDirty && saveTimer === null) scheduleFlush();
-      return result;
-    };
-  }
-
-  if (typeof handleKey === 'function') {
-    const baseHandleKey = handleKey;
-
-    handleKey = function maintainedHandleKey(e, index, item) {
-      const keepBoldOnEnter =
-        e.key === 'Enter' &&
-        !e.isComposing &&
-        !(e.ctrlKey || e.metaKey) &&
-        item?.textColor === 'bold-red';
-
-      if (!keepBoldOnEnter) {
-        return baseHandleKey(e, index, item);
-      }
-
-      e.preventDefault();
-      pushHistory();
-
-      const currentTab = tabs.find(tab => tab.id === activeTabId);
-      if (!currentTab || currentTab.mode !== 'outliner') return;
-
-      const caretPos = e.target.selectionStart;
-      const textAfter = item.text.substring(caretPos);
-      const existedBeforeSplit = Boolean(item.createdAt);
-
-      item.text = item.text.substring(0, caretPos);
-      if (existedBeforeSplit) item.updatedAt = Date.now();
-
-      const newItem = maintenance.createOutlinerItem({
-        text: textAfter,
-        depth: item.depth,
-        textColor: 'bold-red'
-      });
-      if (textAfter.trim() !== '') newItem.createdAt = Date.now();
-
-      let insertIndex = index + 1;
-      if (item.collapsed) insertIndex = index + getSubtreeCount(currentTab, index);
-
-      markAsDirty();
-      currentTab.items.splice(insertIndex, 0, newItem);
-      renderEditor();
-      saveData();
-      window.setTimeout(() => focusItemById(newItem.id, 0), 0);
-    };
   }
 })();
