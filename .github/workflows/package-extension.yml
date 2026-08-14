@@ -1,0 +1,53 @@
+name: Package extension
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate manifest
+        run: python -m json.tool manifest.json > /dev/null
+
+      - name: Validate JavaScript syntax
+        run: |
+          node --check background.js
+          node --check sidepanel-bootstrap.js
+          node --check sidepanel.js
+          node --check sidepanel-model.js
+          node --check sidepanel-runtime.js
+          node --check sidepanel-ui-cleanup.js
+
+      - name: Build extension ZIP
+        run: |
+          zip -r memoexpansion-extension.zip \
+            manifest.json \
+            background.js \
+            sidepanel-bootstrap.html \
+            sidepanel-bootstrap.js \
+            sidepanel.html \
+            sidepanel.js \
+            sidepanel-model.js \
+            sidepanel-runtime.js \
+            sidepanel-ui-cleanup.js \
+            sidepanel-maintenance.css \
+            README_UPDATE.md \
+            icons
+
+      - name: Upload extension ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: memoexpansion-extension
+          path: memoexpansion-extension.zip
+          if-no-files-found: error
+          retention-days: 30
