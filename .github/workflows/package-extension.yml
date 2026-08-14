@@ -22,24 +22,43 @@ jobs:
       - name: Validate JavaScript syntax
         run: |
           node --check background.js
-          node --check sidepanel-bootstrap.js
           node --check sidepanel.js
+          node --check sidepanel-tabs.js
+          node --check sidepanel-render.js
+          node --check sidepanel-selection.js
+          node --check sidepanel-input.js
+          node --check sidepanel-meta.js
+          node --check sidepanel-ui.js
           node --check sidepanel-model.js
           node --check sidepanel-runtime.js
-          node --check sidepanel-ui-cleanup.js
+          node --check sidepanel-accessibility.js
+
+      - name: Validate removed menus and cleanup
+        run: |
+          ! grep -RE "menu-toggle|action-buttons|footer-menu|btn-footer-menu|btn-force-reload|btn-copy-clipboard|btn-download-(txt|md)|showMoveTabMenu|showColorPalette|moveItemToTop|moveItemToBottom|moveItemToTab|copyItem\\(|action-menu-pinned|sidepanel-enter-fix|sidepanel-bootstrap|sidepanel-ui-cleanup" --include='*.js' --include='*.html' --include='*.css' .
+          ! grep -RE "transition: all" --include='*.css' --include='*.html' .
+          ! grep -RE "innerHTML.*tab\\.title" --include='*.js' .
 
       - name: Build extension ZIP
         run: |
           zip -r memoexpansion-extension.zip \
             manifest.json \
             background.js \
-            sidepanel-bootstrap.html \
-            sidepanel-bootstrap.js \
             sidepanel.html \
             sidepanel.js \
+            sidepanel-tabs.js \
+            sidepanel-render.js \
+            sidepanel-selection.js \
+            sidepanel-input.js \
+            sidepanel-meta.js \
+            sidepanel-ui.js \
             sidepanel-model.js \
             sidepanel-runtime.js \
-            sidepanel-ui-cleanup.js \
+            sidepanel-accessibility.js \
+            sidepanel-base.css \
+            sidepanel-tabs.css \
+            sidepanel-editor.css \
+            sidepanel-components.css \
             sidepanel-maintenance.css \
             README_UPDATE.md \
             icons
