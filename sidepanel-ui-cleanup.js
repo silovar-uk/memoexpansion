@@ -2,11 +2,19 @@
   'use strict';
 
   const maintenance = window.MemoMaintenance || (window.MemoMaintenance = {});
+  let observer = null;
 
   function removeEllipsisMenus() {
     document.querySelectorAll('.menu-toggle, .action-buttons, .footer-menu-wrapper').forEach(element => element.remove());
     document.body?.classList.remove('action-menu-pinned');
     if (typeof isActionMenuPinned !== 'undefined') isActionMenuPinned = false;
+  }
+
+  function startEllipsisObserver() {
+    if (observer) return;
+    observer = new MutationObserver(() => removeEllipsisMenus());
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    maintenance.ellipsisObserver = observer;
   }
 
   function makeSafeTabChoice(tab, onClick) {
@@ -79,15 +87,21 @@
       try {
         return baseRenderEditor.apply(this, args);
       } finally {
+        // setupEventListeners() 後のrenderで初めてfooterを含めて撤去する。
         removeEllipsisMenus();
         window.requestAnimationFrame(() => editor?.classList.remove('is-rendering'));
       }
     };
   }
 
-  removeEllipsisMenus();
-
-  const observer = new MutationObserver(() => removeEllipsisMenus());
-  observer.observe(document.documentElement, { childList: true, subtree: true });
-  maintenance.ellipsisObserver = observer;
+  // sidepanel.js の DOMContentLoaded 初期化を先に完走させてから撤去する。
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      removeEllipsisMenus();
+      startEllipsisObserver();
+    }, { once: true });
+  } else {
+    removeEllipsisMenus();
+    startEllipsisObserver();
+  }
 })();
