@@ -1,0 +1,111 @@
+/* MemoTool 2.1.0: non-functional visual/maintenance layer */
+:root {
+  --bg-color: #f7f7f5;
+  --text-color: #27272a;
+  --text-muted: #71717a;
+  --text-faint: #a1a1aa;
+  --border-color: #e4e4e7;
+  --border-strong: #d4d4d8;
+  --surface: #ffffff;
+  --surface-subtle: #f4f4f5;
+  --surface-hover: #f0f0f2;
+  --accent-color: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: #eff6ff;
+  --success-color: #16a34a;
+  --warning-color: #ca8a04;
+  --danger-color: #dc2626;
+  --tab-active-bg: #ffffff;
+  --tab-inactive-bg: #f4f4f5;
+  --hover-bg: #f0f0f2;
+  --selected-bg: #eff6ff;
+  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px rgba(37, 99, 235, .55);
+}
+
+.menu-toggle,
+.action-buttons,
+.footer-menu-wrapper {
+  display: none !important;
+}
+
+.row-actions {
+  gap: 0;
+  min-width: 28px;
+}
+
+.action-icon.check,
+.control-btn,
+.footer-icon-btn,
+.tab-scroll-btn,
+#new-tab-btn {
+  min-width: 28px;
+  min-height: 28px;
+  touch-action: manipulation;
+}
+
+button,
+.action-icon,
+.fold-icon,
+.tab,
+.mode-menu-item,
+.popup-menu-item,
+.color-swatch {
+  transition-property: background-color, border-color, color, opacity, box-shadow, transform;
+  transition-duration: .14s;
+  transition-timing-function: ease;
+}
+
+button:focus-visible,
+.action-icon:focus-visible,
+.fold-icon:focus-visible,
+.tab:focus-visible,
+.mode-menu-item:focus-visible,
+.popup-menu-item:focus-visible,
+.color-swatch:focus-visible,
+.item-input:focus-visible,
+.item-note:focus-visible,
+.text-editor-area:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.item-input:focus-visible,
+.item-note:focus-visible,
+.text-editor-area:focus-visible {
+  border-radius: 3px;
+}
+
+#editor.is-rendering .row,
+#editor.is-rendering .item-input,
+#editor.is-rendering .item-note {
+  transition: none !important;
+}
+
+@media (pointer: coarse) {
+  .action-icon.check,
+  .control-btn,
+  .footer-icon-btn,
+  .tab-scroll-btn,
+  #new-tab-btn,
+  .fold-icon {
+    min-width: 32px;
+    min-height: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+
+  .instance-alert,
+  .save-status[data-state="saving"] .save-status-dot,
+  .row.line-jump-target {
+    animation: none !important;
+  }
+}
