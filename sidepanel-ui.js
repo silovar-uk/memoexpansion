@@ -85,26 +85,33 @@ function fallbackCopyText(text) {
   return copied;
 }
 
+function copyIconMarkup() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="10" height="10" rx="2"/><path d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/></svg>';
+}
+
+function checkIconMarkup() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>';
+}
+
 function setCopyAllFeedback(state) {
   const button = document.getElementById('btn-copy-all');
-  const label = document.getElementById('copy-all-label');
-  if (!button || !label) return;
+  if (!button) return;
 
   if (copyAllFeedbackTimer) clearTimeout(copyAllFeedbackTimer);
   button.classList.remove('copied', 'copy-failed');
 
   if (state === 'success') {
-    label.textContent = 'コピー済み';
+    button.innerHTML = checkIconMarkup();
     button.classList.add('copied');
     button.setAttribute('aria-label', 'メモ全体をコピーしました');
   } else {
-    label.textContent = 'コピー失敗';
+    button.innerHTML = copyIconMarkup();
     button.classList.add('copy-failed');
     button.setAttribute('aria-label', 'メモ全体のコピーに失敗しました');
   }
 
   copyAllFeedbackTimer = setTimeout(() => {
-    label.textContent = '全体をコピー';
+    button.innerHTML = copyIconMarkup();
     button.classList.remove('copied', 'copy-failed');
     button.setAttribute('aria-label', 'メモ全体をコピー');
   }, 1600);
