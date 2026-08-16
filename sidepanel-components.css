@@ -111,6 +111,7 @@
     align-items: center;
     gap: 4px;
   }
+  .footer-right { gap: 8px; }
   .footer-icon-btn {
     width: 28px;
     height: 28px;
@@ -126,6 +127,38 @@
     border-color: var(--border-color);
   }
   .footer-icon-btn:disabled { opacity: .35; cursor: default; background: transparent; border-color: transparent; }
+
+  .copy-all-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .copy-all-btn svg { width: 14px; height: 14px; }
+  .copy-all-btn:hover {
+    color: var(--text-color);
+    background: var(--surface-hover);
+    border-color: var(--border-color);
+  }
+  .copy-all-btn.copied {
+    color: var(--success-color);
+    background: #f0fdf4;
+    border-color: #dcfce7;
+  }
+  .copy-all-btn.copy-failed {
+    color: var(--danger-color);
+    background: #fef2f2;
+    border-color: #fee2e2;
+  }
 
   .save-status {
     display: inline-flex;
