@@ -1,3 +1,5 @@
+let copyAllFeedbackTimer = null;
+
 function setupEventListeners() {
   const menuBtn = document.getElementById('new-tab-btn');
   const menu = document.getElementById('new-tab-menu');
@@ -27,6 +29,8 @@ function setupEventListeners() {
   if (btnLineNumbers) btnLineNumbers.onclick = toggleLineNumbers;
   const btnSort = document.getElementById('btn-sort-stars');
   if (btnSort) btnSort.onclick = sortItemsByStars;
+  const btnCopyAll = document.getElementById('btn-copy-all');
+  if (btnCopyAll) btnCopyAll.onclick = copyActiveMemoToClipboard;
   const btnHistory = document.getElementById('btn-history');
   if (btnHistory) btnHistory.onclick = showHistoryModal;
   const btnCloseHistory = document.getElementById('btn-close-history');
@@ -37,6 +41,90 @@ function setupEventListeners() {
       if (e.target === historyModal) hideHistoryModal();
     });
   }
+}
+
+function getActiveMemoPlainText() {
+  const currentTab = tabs.find(t => t.id === activeTabId);
+  if (!currentTab) return '';
+
+  if (currentTab.mode === 'text') {
+    const textarea = document.querySelector('.text-editor-area');
+    return textarea ? textarea.value : (currentTab.content || '');
+  }
+
+  syncRenderedOutlinerState();
+  return (currentTab.items || [])
+    .filter(item => !item.completed)
+    .map(item => item.text || '')
+    .join('\n');
+}
+
+function fallbackCopyText(text) {
+  const previousFocus = document.activeElement;
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.setAttribute('aria-hidden', 'true');
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  textarea.style.top = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } catch (error) {
+    console.error('Fallback copy failed', error);
+  }
+
+  textarea.remove();
+  if (previousFocus && typeof previousFocus.focus === 'function') {
+    try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
+  }
+  return copied;
+}
+
+function setCopyAllFeedback(state) {
+  const button = document.getElementById('btn-copy-all');
+  const label = document.getElementById('copy-all-label');
+  if (!button || !label) return;
+
+  if (copyAllFeedbackTimer) clearTimeout(copyAllFeedbackTimer);
+  button.classList.remove('copied', 'copy-failed');
+
+  if (state === 'success') {
+    label.textContent = 'コピー済み';
+    button.classList.add('copied');
+    button.setAttribute('aria-label', 'メモ全体をコピーしました');
+  } else {
+    label.textContent = 'コピー失敗';
+    button.classList.add('copy-failed');
+    button.setAttribute('aria-label', 'メモ全体のコピーに失敗しました');
+  }
+
+  copyAllFeedbackTimer = setTimeout(() => {
+    label.textContent = '全体をコピー';
+    button.classList.remove('copied', 'copy-failed');
+    button.setAttribute('aria-label', 'メモ全体をコピー');
+  }, 1600);
+}
+
+async function copyActiveMemoToClipboard() {
+  const text = getActiveMemoPlainText();
+  let copied = false;
+
+  if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    try {
+      await navigator.clipboard.writeText(text);
+      copied = true;
+    } catch (error) {
+      console.warn('Clipboard API copy failed; trying fallback', error);
+    }
+  }
+
+  if (!copied) copied = fallbackCopyText(text);
+  setCopyAllFeedback(copied ? 'success' : 'error');
 }
 
 function toggleFold(index, forceCollapse = null) {
