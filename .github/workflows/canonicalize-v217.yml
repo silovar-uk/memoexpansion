@@ -1,0 +1,92 @@
+name: Canonicalize v2.1.7
+
+on:
+  push:
+    branches:
+      - canonicalize-v217
+
+permissions:
+  contents: write
+
+jobs:
+  canonicalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout candidate branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct verified patch bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat migration/patch.part-00 migration/patch.part-01 migration/patch.part-02 > /tmp/v217-patches.tar.gz
+          echo '0c7b740587e50fb8561a1239d23060f8d63eaf6c573aa45a57f7c26bf6a9d41e  /tmp/v217-patches.tar.gz' | sha256sum -c -
+          mkdir -p /tmp/v217-patches
+          tar -xzf /tmp/v217-patches.tar.gz -C /tmp/v217-patches
+
+      - name: Apply v2.1.0 to v2.1.7 patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          for patch_file in /tmp/v217-patches/*.patch; do
+            echo "Applying ${patch_file}"
+            patch --batch --forward -p0 < "$patch_file"
+          done
+          cp migration/package-extension.yml .github/workflows/package-extension.yml
+
+      - name: Verify canonical git blob hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_hash() {
+            local path="$1" expected="$2" actual
+            actual="$(git hash-object "$path")"
+            if [[ "$actual" != "$expected" ]]; then
+              echo "Hash mismatch: $path expected=$expected actual=$actual" >&2
+              exit 1
+            fi
+          }
+          check_hash .github/workflows/package-extension.yml 264d5ddcabeb5e6f188e49151d2b967b5f1da8ad
+          check_hash README_UPDATE.md 38e25374dd6a1c2f2f3d0d22de9fde7d20309889
+          check_hash background.js 94efb88aa87a62b23911174658be60933d73782b
+          check_hash manifest.json ac11c3a884d87cbab54444a62648ed57573dce53
+          check_hash ARCHITECTURE.md b7b563dbf4d1fe89530af2a621f274066bb71d90
+          check_hash CSS_OWNERSHIP.md 81a40c5505e3bca1ac8f8b19380eac88cf21d7f0
+          check_hash CURRENT_BEHAVIOR.md 966650ec324afcf47ff29a3713f505f5c25cc650
+          check_hash outliner-structure.js 79847a5fd492d4146873072f0789646ad5e995ab
+          check_hash sidepanel-focus.js 7c7f0c8177d81672daf7a999f49bda825498494a
+          check_hash sidepanel-input.js f6b3c72e766e217b6f1406b9fca98013dfed368e
+          check_hash sidepanel-maintenance.css 0c995e2c21da35f98986ce07c6847277b650d1ef
+          check_hash sidepanel-meta.js fb120eeeac970b71010b876eb70253a1d8107663
+          check_hash sidepanel-render.js cc973bd1b830f0c130e3da874693ce0c04180d6b
+          check_hash sidepanel-selection.js 1695c8d2d52bab4f6a8040eb8e4be39dd9b95259
+          check_hash sidepanel-ui.js c3800e1bd8907f30567ea9e14a1a4fade2e4f389
+          check_hash sidepanel.html e3825e484f5396d1ea6f133f39be31f9bf5b1488
+          check_hash sidepanel.js 8afbf8b60768f8a02d3c8fd8991e0ef206b87a06
+          check_hash tests/outliner-structure.test.js 9914f3abb7efbf1ce111fd8492bdf35adc2a20d4
+
+      - name: Validate runtime and contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m json.tool manifest.json > /dev/null
+          for file in background.js outliner-structure.js sidepanel.js sidepanel-tabs.js sidepanel-render.js sidepanel-selection.js sidepanel-input.js sidepanel-meta.js sidepanel-ui.js sidepanel-model.js sidepanel-runtime.js sidepanel-focus.js sidepanel-accessibility.js tests/outliner-structure.test.js; do
+            node --check "$file"
+          done
+          node tests/outliner-structure.test.js
+          test "$(python -c 'import json; print(json.load(open("manifest.json"))["version"])')" = "2.1.7"
+
+      - name: Remove migration-only files and commit canonical baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf migration .github/workflows/canonicalize-v217.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'Canonicalize MemoTool v2.1.7 baseline'
+          git push origin HEAD:canonicalize-v217
