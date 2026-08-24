@@ -163,30 +163,44 @@
   .save-status {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    min-width: 64px;
+    gap: 5px;
+    width: 66px;
+    min-width: 66px;
     justify-content: flex-end;
     color: var(--text-muted);
-    font-size: 11px;
+    font-size: 10.5px;
+    font-variant-numeric: tabular-nums;
     user-select: none;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .14s ease, color .14s ease;
+  }
+  /* The healthy steady state should not compete with memo content. Keeping the
+     width reserved prevents footer layout shift when dirty/saving/error appears. */
+  .save-status[data-state="saved"] {
+    opacity: 0;
+    visibility: hidden;
   }
   .save-status-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: var(--success-color);
-    box-shadow: 0 0 0 2px rgba(22, 163, 74, .10);
+    box-shadow: none;
+    flex-shrink: 0;
   }
-  .save-status[data-state="dirty"] .save-status-dot { background: var(--warning-color); box-shadow: 0 0 0 2px rgba(202,138,4,.10); }
+  .save-status[data-state="dirty"] { color: var(--warning-color); }
+  .save-status[data-state="dirty"] .save-status-dot { background: var(--warning-color); }
+  .save-status[data-state="saving"] { color: var(--text-muted); }
   .save-status[data-state="saving"] .save-status-dot {
     background: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(37,99,235,.10);
-    animation: save-pulse 1s ease-in-out infinite;
+    animation: save-pulse .9s ease-in-out infinite;
   }
-  .save-status[data-state="error"] { color: var(--danger-color); }
-  .save-status[data-state="error"] .save-status-dot { background: var(--danger-color); box-shadow: 0 0 0 2px rgba(220,38,38,.10); }
-  .save-status[data-state="feedback"] .save-status-dot { background: var(--accent-color); box-shadow: 0 0 0 2px rgba(37,99,235,.10); }
-  @keyframes save-pulse { 50% { opacity: .35; transform: scale(.8); } }
+  .save-status[data-state="error"] { color: var(--danger-color); font-weight: 600; }
+  .save-status[data-state="error"] .save-status-dot { background: var(--danger-color); }
+  .save-status[data-state="feedback"] { color: var(--text-muted); }
+  .save-status[data-state="feedback"] .save-status-dot { background: var(--accent-color); }
+  @keyframes save-pulse { 50% { opacity: .28; transform: scale(.82); } }
 
   .editor-bg-red { background-color: #fff7f7 !important; }
   .editor-bg-blue { background-color: #f7faff !important; }
