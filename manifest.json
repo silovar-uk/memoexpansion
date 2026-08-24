@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.3.0",
-  "description": "保存競合とタブ復帰を契約化し、未保存・保存中・エラー時だけ静かに状態を示すMemoTool。",
+  "version": "2.4.0",
+  "description": "タブが増えてもAlt+Qまたは検索ボタンから名前で素早く切り替えられるNavigation Confidence版MemoTool。",
   "permissions": [
     "sidePanel",
     "storage",
