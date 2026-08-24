@@ -1,3 +1,15 @@
+# MemoTool v2.3.0 — Save Confidence
+
+## 2026/08/25
+
+- タブ切替だけでも `activeTabId` をdirty扱いにし、再起動後の復帰先が古いままになる経路を修正
+- 保存snapshotを `tabs + activeTabId` の組として `save-state.js` で契約化
+- 保存中の追加入力／タブ切替で新しい状態がdirtyのまま再保存されることをpure testで固定
+- `sidepanel-runtime.js` の保存を180ms debounce＋直列化のまま整理し、dirtyでない空状態の無駄な定期保存を停止
+- footerに保存状態DOMを復活。通常の「保存済み」は非表示、`未保存 / 保存中 / 保存エラー` のときだけ表示
+- `visibilitychange` / `pagehide` のbest-effort flushを維持
+- Save Confidence用のpure testと静的contract testをGitHub Actionsへ追加
+
 # MemoTool v2.2.0 — Quiet Shell
 
 ## 2026/08/25
