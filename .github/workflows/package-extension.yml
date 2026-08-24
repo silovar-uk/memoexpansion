@@ -24,6 +24,7 @@ jobs:
           node --check background.js
           node --check outliner-structure.js
           node --check save-state.js
+          node --check tab-navigation-core.js
           node --check sidepanel.js
           node --check sidepanel-tabs.js
           node --check sidepanel-render.js
@@ -36,9 +37,12 @@ jobs:
           node --check sidepanel-focus.js
           node --check sidepanel-accessibility.js
           node --check sidepanel-shell.js
+          node --check sidepanel-navigation.js
           node --check tests/ui-shell-contract.test.js
           node --check tests/save-state.test.js
           node --check tests/save-contract.test.js
+          node --check tests/tab-navigation.test.js
+          node --check tests/navigation-contract.test.js
           node --check tests/outliner-structure.test.js
 
       - name: Run structure characterization tests
@@ -51,6 +55,11 @@ jobs:
         run: |
           node tests/save-state.test.js
           node tests/save-contract.test.js
+
+      - name: Run navigation confidence tests
+        run: |
+          node tests/tab-navigation.test.js
+          node tests/navigation-contract.test.js
 
       - name: Validate removed menus and cleanup
         run: |
@@ -65,6 +74,7 @@ jobs:
             background.js \
             outliner-structure.js \
             save-state.js \
+            tab-navigation-core.js \
             sidepanel.html \
             sidepanel.js \
             sidepanel-tabs.js \
@@ -77,13 +87,15 @@ jobs:
             sidepanel-runtime.js \
             sidepanel-focus.js \
             sidepanel-accessibility.js \
+            sidepanel-shell.css \
+            sidepanel-shell.js \
+            sidepanel-navigation.css \
+            sidepanel-navigation.js \
             sidepanel-base.css \
             sidepanel-tabs.css \
             sidepanel-editor.css \
             sidepanel-components.css \
             sidepanel-maintenance.css \
-            sidepanel-shell.css \
-            sidepanel-shell.js \
             README_UPDATE.md \
             icons
 
@@ -91,12 +103,12 @@ jobs:
         run: |
           unzip -t memoexpansion-extension.zip
           unzip -Z1 memoexpansion-extension.zip | grep -qx 'manifest.json'
-          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.3.0"
+          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.4.0"
 
       - name: Upload extension ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: memoexpansion-extension-v2.3.0
+          name: memoexpansion-extension-v2.4.0
           path: memoexpansion-extension.zip
           if-no-files-found: error
           retention-days: 30
