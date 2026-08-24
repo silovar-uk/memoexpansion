@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="sidepanel-components.css">
 <link rel="stylesheet" href="sidepanel-maintenance.css">
 <link rel="stylesheet" href="sidepanel-shell.css">
+<link rel="stylesheet" href="sidepanel-navigation.css">
 </head>
 <body>
 
@@ -23,6 +24,9 @@
 
   <div class="tab-utility-group" aria-label="メモ操作">
     <span id="instance-count" class="instance-indicator" hidden aria-live="polite"></span>
+    <button id="btn-tab-search" class="control-btn" type="button" title="メモを探す (Alt+Q)" aria-label="メモを探す" aria-haspopup="dialog" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+    </button>
     <button id="btn-line-numbers" class="control-btn" title="行番号を非表示（アウトライナーのみ）" aria-label="行番号の表示切替" aria-pressed="true">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 5h1v3M4 11h2l-2 3h2M4 17h2v3H4"/></svg>
     </button>
@@ -45,6 +49,14 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<div id="tab-switcher" class="tab-switcher" hidden>
+  <div class="tab-switcher-panel" role="dialog" aria-label="メモを探す">
+    <input id="tab-switcher-input" type="search" autocomplete="off" spellcheck="false" placeholder="メモ名で検索..." aria-label="メモ名で検索">
+    <div id="tab-switcher-list" role="listbox" aria-label="メモ候補"></div>
+    <div class="tab-switcher-hint">↑↓ 選択 · Enter 開く · Esc 閉じる</div>
   </div>
 </div>
 
@@ -97,5 +109,7 @@
 <script src="sidepanel-focus.js"></script>
 <script src="sidepanel-accessibility.js"></script>
 <script src="sidepanel-shell.js"></script>
+<script src="tab-navigation-core.js"></script>
+<script src="sidepanel-navigation.js"></script>
 </body>
 </html>
