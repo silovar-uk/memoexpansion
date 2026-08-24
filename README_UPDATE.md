@@ -1,3 +1,16 @@
+# MemoTool v2.4.0 — Navigation Confidence
+
+## 2026/08/25
+
+- タブ右端に小さな検索ボタンを追加し、`Alt+Q` でもQuick Switchを開けるように変更
+- タブ名をNFKC正規化＋部分一致で検索。AI検索・曖昧ランキング・最近使った順は導入しない
+- 空検索では既存タブ順を維持し、現在タブを初期選択
+- ↑↓で候補移動、Enterで切替、Escで閉じるキーボード操作を追加
+- 実際のタブ切替は既存 `switchTab()` を再利用し、保存・activeTabId契約を二重実装しない
+- Quick Switchは新しいstorage keyや履歴stateを作らず、一時的な検索query/selectionだけを保持
+- `tab-navigation-core.js` にpure検索ロジックを分離し、8件のcore testを追加
+- `sidepanel-navigation.js/css` と10件の静的Navigation contract testを追加
+
 # MemoTool v2.3.0 — Save Confidence
 
 ## 2026/08/25
