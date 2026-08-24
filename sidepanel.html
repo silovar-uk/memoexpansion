@@ -7,26 +7,10 @@
 <link rel="stylesheet" href="sidepanel-editor.css">
 <link rel="stylesheet" href="sidepanel-components.css">
 <link rel="stylesheet" href="sidepanel-maintenance.css">
+<link rel="stylesheet" href="sidepanel-shell.css">
 </head>
 <body>
 
-<header>
-  <div id="status-bar">
-    <div class="status-left">
-      <span class="status-title">memo tool</span>
-      <span id="instance-count" class="status-pill">起動中: 1つ</span>
-    </div>
-
-    <div class="status-right">
-      <button id="btn-line-numbers" class="control-btn" title="行番号を非表示（アウトライナーのみ）" aria-label="行番号の表示切替" aria-pressed="true">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 5h1v3M4 11h2l-2 3h2M4 17h2v3H4"/></svg>
-      </button>
-      <button id="btn-sort-stars" class="control-btn" title="★の数で降順ソート" aria-label="★の数で降順ソート">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8.2l5-.7L12 3Z"/><path d="M19 14v7m0 0-3-3m3 3 3-3"/></svg>
-      </button>
-    </div>
-  </div>
-</header>
 
 <div id="tab-header-area">
   <button id="tab-scroll-left" class="tab-scroll-btn" title="左へスクロール" aria-label="左へスクロール">
@@ -37,18 +21,28 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
   </button>
 
-  <div class="new-tab-wrapper">
-    <button id="new-tab-btn" title="新規メモ作成" aria-label="新規メモ作成">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  <div class="tab-utility-group" aria-label="メモ操作">
+    <span id="instance-count" class="instance-indicator" hidden aria-live="polite"></span>
+    <button id="btn-line-numbers" class="control-btn" title="行番号を非表示（アウトライナーのみ）" aria-label="行番号の表示切替" aria-pressed="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 5h1v3M4 11h2l-2 3h2M4 17h2v3H4"/></svg>
     </button>
-    <div id="new-tab-menu" class="mode-menu">
-      <div class="mode-menu-item" id="menu-outliner">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
-        <span>アウトライナー</span>
-      </div>
-      <div class="mode-menu-item" id="menu-text">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-        <span>テキスト</span>
+    <button id="btn-sort-stars" class="control-btn" title="★の数で降順ソート" aria-label="★の数で降順ソート">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8.2l5-.7L12 3Z"/><path d="M19 14v7m0 0-3-3m3 3 3-3"/></svg>
+    </button>
+
+    <div class="new-tab-wrapper">
+      <button id="new-tab-btn" title="新規メモ作成" aria-label="新規メモ作成">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <div id="new-tab-menu" class="mode-menu">
+        <div class="mode-menu-item" id="menu-outliner">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+          <span>アウトライナー</span>
+        </div>
+        <div class="mode-menu-item" id="menu-text">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          <span>テキスト</span>
+        </div>
       </div>
     </div>
   </div>
@@ -97,5 +91,6 @@
 <script src="sidepanel-runtime.js"></script>
 <script src="sidepanel-focus.js"></script>
 <script src="sidepanel-accessibility.js"></script>
+<script src="sidepanel-shell.js"></script>
 </body>
 </html>
