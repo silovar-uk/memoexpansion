@@ -1,7 +1,7 @@
 # MemoTool — Current Behavior Contract
 
-Baseline: **v2.3.0**  
-Canonical behavior source: **v2.1.7 behavior contract + v2.2.0 Quiet Shell + v2.3.0 Save Confidence**  
+Baseline: **v2.4.0**  
+Canonical behavior source: **v2.1.7 behavior contract + v2.2.0 Quiet Shell + v2.3.0 Save Confidence + v2.4.0 Navigation Confidence**  
 Updated: **2026-08-25**
 
 This file is a regression contract. Refactors may reorganize code, but must not change the behaviors below unless a later product decision explicitly updates this contract.
@@ -20,12 +20,25 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 
 - The dedicated `memo tool / 起動中` header row is no longer persistent UI.
 - The tab strip is the topmost persistent navigation surface.
-- Line-number toggle, star sort and new-tab controls live beside the tab strip as contextual utilities.
+- Line-number toggle, star sort, tab search and new-tab controls live beside the tab strip as compact utilities.
 - Line-number toggle and star sort are visible only while an outliner tab is active.
+- Tab search remains available for both outliner and text tabs.
 - Single-instance state is visually silent.
 - Multiple Side Panel instances are surfaced only when the background reports two or more connected panels.
 - `sidepanel-shell.css` owns persistent top-chrome presentation.
 - `sidepanel-shell.js` may adapt existing global shell functions but must not own memo content, storage mutation, tab CRUD or outliner structure.
+
+## Navigation Confidence
+
+- The tab-search button and `Alt+Q` open the same Quick Switch surface inside the Side Panel.
+- Quick Switch searches existing tab titles using normalized substring matching; it does not use fuzzy ranking, AI search or usage history.
+- Empty-query results preserve the existing tab order.
+- When opening with an empty query, the current tab is selected if present.
+- Arrow Up/Down moves the selected candidate, Enter activates it, and Escape closes the switcher.
+- Activating a candidate reuses the existing `switchTab()` behavior and then returns focus to the current memo.
+- Quick Switch does not reorder tabs, mutate tab metadata, create storage keys or persist navigation history.
+- `tab-navigation-core.js` owns DOM-free title normalization/filtering and result-index movement.
+- `sidepanel-navigation.js` owns the temporary switcher UI only; it does not own tab CRUD or persistence.
 
 ## Tabs
 
