@@ -1,6 +1,6 @@
 # MemoTool — CSS Ownership Map
 
-Baseline: **v2.2.0**  
+Baseline: **v2.3.0**  
 Updated: **2026-08-25**
 
 The UI is split by responsibility. A selector should have one long-term owner. `sidepanel-maintenance.css` remains a refinement/migration layer, not a permanent dumping ground.
@@ -55,7 +55,12 @@ The v2.1.6 overlap fix and neutral selection language remain accepted behavior a
 
 Owns reusable secondary components, including footer/icon controls, save-status styling, line-number/jump UI and other self-contained utilities that are not part of core row/tab mechanics.
 
-Note: save-status styles currently exist without mounted `#save-status` markup. That is a product/system gap, not a reason to add more CSS.
+Save Confidence contract in v2.3.0:
+- `.save-status` keeps a fixed 66px footprint so state changes never shift footer controls;
+- `saved` is visually hidden because healthy persistence is the quiet steady state;
+- `dirty`, `saving`, `error`, and transient feedback are visible;
+- error styling remains persistent until a later save attempt changes state;
+- Shell CSS must not redefine save-state semantics.
 
 ## `sidepanel-maintenance.css`
 
@@ -77,10 +82,10 @@ Rules:
 4. After migration, delete duplicate maintenance rules rather than accumulating override pairs.
 5. Visual behavior must remain unchanged during ownership-only migration.
 
-## Ownership migration order after v2.2.0
+## Ownership migration order after v2.3.0
 
 Recommended:
 1. remove dead legacy header/status CSS after confirming Quiet Shell stability;
 2. promote row/action overlap + selection -> `sidepanel-editor.css`;
-3. consolidate reusable line-number/footer utilities -> `sidepanel-components.css`;
-4. prune superseded tab rules from `sidepanel-maintenance.css` only after the shell has survived at least one release.
+3. consolidate remaining reusable line-number/footer utilities -> `sidepanel-components.css` without changing Save Confidence behavior;
+4. prune superseded tab rules from `sidepanel-maintenance.css` only after the shell has survived multiple releases.
