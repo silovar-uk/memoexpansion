@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.2.0",
-  "description": "タブを最上段にしたQuiet Shellへ再構成し、アウトライナー文脈の操作だけを静かに常設するメモツール。",
+  "version": "2.3.0",
+  "description": "保存競合とタブ復帰を契約化し、未保存・保存中・エラー時だけ静かに状態を示すMemoTool。",
   "permissions": [
     "sidePanel",
     "storage",
