@@ -27,8 +27,10 @@ function createNewTab(mode = 'outliner') {
 }
 
 function switchTab(tabId) {
+  if (tabId === activeTabId) return;
   activeTabId = tabId;
-  selectedItemIds.clear(); 
+  selectedItemIds.clear();
+  markAsDirty();
   saveData();
   renderTabs();
   renderEditor();
