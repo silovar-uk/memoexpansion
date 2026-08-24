@@ -1,3 +1,15 @@
+# MemoTool v2.2.0 — Quiet Shell
+
+## 2026/08/25
+
+- 専用の `memo tool / 起動中` ヘッダー段を廃止し、タブを最上段へ移動
+- 行番号・★ソート・新規メモをタブ右端のContextual Utilityへ統合
+- 行番号と★ソートはアウトライナー時だけ表示し、テキストメモでは自動的に退避
+- 複数Side Panelの警告は通常時には表示せず、2つ以上起動した時だけ小さな警告として表示
+- `sidepanel-shell.css/js` をShellの正式ownerとして追加し、編集・保存・タブCRUD・アウトライナー構造とは責務を分離
+- 既存のAlt+A、タブ操作、アウトライナー、Undo/Redo、全体コピー、保存構造は変更しない
+- Quiet Shellの静的契約テストを追加
+
 # v2.1.7 Baseline & Contract
 
 - v2.1.6 を canonical baseline として正本化
@@ -93,7 +105,6 @@
 - ユーザー由来のタブ名を `innerHTML` へ挿入するコードがないことを確認
 - GitHub Actionsで完成版ZIPを自動生成
 - Manifestバージョン: `2.1.0`
-
 
 ## v2.1.3 (2026-08-17)
 
