@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.1.7",
-  "description": "v2.1.6を正本化し、アウトライナー構造契約・テスト・CSS責務を固定したメモツール。ALT+A開閉と静かな高密度UIを維持。",
+  "version": "2.2.0",
+  "description": "タブを最上段にしたQuiet Shellへ再構成し、アウトライナー文脈の操作だけを静かに常設するメモツール。",
   "permissions": [
     "sidePanel",
     "storage",
