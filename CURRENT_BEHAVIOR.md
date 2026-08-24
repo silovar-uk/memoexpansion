@@ -1,7 +1,7 @@
 # MemoTool — Current Behavior Contract
 
-Baseline: **v2.2.0**  
-Canonical behavior source: **v2.1.7 behavior contract + v2.2.0 Quiet Shell presentation decision**  
+Baseline: **v2.3.0**  
+Canonical behavior source: **v2.1.7 behavior contract + v2.2.0 Quiet Shell + v2.3.0 Save Confidence**  
 Updated: **2026-08-25**
 
 This file is a regression contract. Refactors may reorganize code, but must not change the behaviors below unless a later product decision explicitly updates this contract.
@@ -33,6 +33,7 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - New tabs may be created in text or outliner mode through the existing UI.
 - Tab rename, close, reorder and mode switching remain available.
 - `activeTabId` identifies the current tab and is persisted with memo state.
+- Switching tabs is itself a persisted state change: `activeTabId` must mark the app dirty before a save is scheduled.
 
 ## Outliner model
 
@@ -74,14 +75,19 @@ Pure structural ownership lives in `outliner-structure.js`.
 - Existing history behavior remains available for supported memo mutations.
 - Structural refactors must not silently bypass the existing `pushHistory()` boundaries.
 
-## Persistence
+## Persistence / Save Confidence
 
 - Memo state is stored in `chrome.storage.local` using the existing `tabs`, `activeTabId` and related keys.
+- A save snapshot is the pair **serialized `tabs` + `activeTabId`**. Pure snapshot comparison lives in `save-state.js`.
 - Local rendering may mark state dirty before persistence.
+- Writes remain serialized through `sidepanel-runtime.js`.
+- If memo content or `activeTabId` changes while a storage write is in flight, completion of that older write must not clear the newer dirty state; the newer snapshot is queued again.
 - Save paths normalize the completed archive before writing.
+- Storage write failure leaves the app dirty and exposes the error state so a later scheduled save can retry.
+- `visibilitychange` and `pagehide` request an immediate best-effort flush when dirty; they supplement the normal 180ms debounce rather than replacing it.
 - External storage updates must not blindly replace locally dirty or actively edited state.
 - Context-menu capture inserts a new active outliner item before the completed archive.
-- Save-state functions and styles exist, but v2.2.0 does **not** mount a persistent `#save-status` element in the Side Panel. Do not treat visual save confirmation as an existing user-facing contract until it is deliberately restored or redesigned.
+- The footer mounts `#save-status`. The steady `saved` state is visually hidden; `dirty`, `saving`, `error`, and transient feedback states are visible without changing footer geometry.
 
 ## Compatibility rule
 
