@@ -1,74 +1,277 @@
-/* MemoTool 2.1.0: non-functional visual/maintenance layer */
+/* MemoTool 2.1.6: quiet-density visual refinement layer */
 :root {
-  --bg-color: #f7f7f5;
-  --text-color: #27272a;
-  --text-muted: #71717a;
-  --text-faint: #a1a1aa;
-  --border-color: #e4e4e7;
-  --border-strong: #d4d4d8;
+  --bg-color: #f7f7f4;
+  --text-color: #292925;
+  --text-muted: #6f6f69;
+  --text-faint: #aaa9a2;
+  --border-color: #e6e6e0;
+  --border-strong: #d5d5ce;
   --surface: #ffffff;
-  --surface-subtle: #f4f4f5;
-  --surface-hover: #f0f0f2;
-  --accent-color: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-soft: #eff6ff;
-  --success-color: #16a34a;
-  --warning-color: #ca8a04;
-  --danger-color: #dc2626;
+  --surface-subtle: #f5f5f1;
+  --surface-hover: #f1f1ed;
+  --accent-color: #3f6481;
+  --accent-hover: #31536d;
+  --accent-soft: #f3f6f7;
+  --success-color: #4d7457;
+  --warning-color: #94712f;
+  --danger-color: #a94b47;
   --tab-active-bg: #ffffff;
-  --tab-inactive-bg: #f4f4f5;
-  --hover-bg: #f0f0f2;
-  --selected-bg: #eff6ff;
-  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px rgba(37, 99, 235, .55);
+  --tab-inactive-bg: transparent;
+  --hover-bg: #f1f1ed;
+  --selected-bg: #f2f2ee;
+  --selection-mark: #44443f;
+  --focus-color: #55554f;
 }
 
+/* Typography / canvas: neutral, compact, content-first */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", sans-serif;
+  letter-spacing: .005em;
+}
+header { padding: 4px 10px; }
+.status-title { font-weight: 600; letter-spacing: .01em; }
+.status-pill {
+  color: var(--text-faint);
+  background: transparent;
+  padding: 2px 3px;
+}
+
+/* Header controls should read as tools, not boxed buttons. */
+.control-btn {
+  border-color: transparent;
+  background: transparent;
+  border-radius: 4px;
+}
+.control-btn:hover {
+  border-color: transparent;
+  background: var(--surface-hover);
+  color: var(--text-color);
+}
+
+/* Tabs: stable geometry; active state is typography + a quiet underline. */
+#tab-header-area {
+  background: #f1f1ed;
+  padding: 5px 5px 0;
+  gap: 1px;
+  border-bottom: 1px solid var(--border-color);
+}
+.tab {
+  box-sizing: border-box;
+  height: 29px;
+  margin-top: 0;
+  padding: 0 9px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 3px 3px 0 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 400;
+  transition: background-color .12s ease, color .12s ease, border-color .12s ease;
+}
+.tab:hover:not(.active) { background: rgba(255,255,255,.45); color: var(--text-color); }
+.tab.active {
+  height: 29px;
+  margin-top: 0;
+  background: var(--surface);
+  color: var(--text-color);
+  font-weight: 600;
+  box-shadow: none;
+  border-bottom-color: #3d3d38;
+}
+.close-tab-btn { border-radius: 3px; opacity: .42; }
+.tab:hover .close-tab-btn, .tab.active .close-tab-btn { opacity: .7; }
+.close-tab-btn:hover { background: #f6eeee; color: var(--danger-color); opacity: 1; }
+.tab-scroll-btn {
+  border-color: transparent;
+  background: transparent;
+  border-radius: 4px;
+}
+.tab-scroll-btn:hover { background: rgba(255,255,255,.65); border-color: transparent; }
+#new-tab-btn:hover { color: var(--text-color); background: rgba(255,255,255,.65); }
+
+/* Editor density: a little less framing, no loss of scan speed. */
+#editor { padding: 13px 14px 72px; }
+#editor.line-numbers-visible { padding-left: 42px; }
+.row {
+  min-height: 27px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  border-radius: 2px;
+  transition: background-color .11s ease, opacity .2s ease;
+}
+.row:hover:not(.selected) { background: #fafaf8; }
+
+/* Selection is neutral and quiet: no blue wash or blue perimeter. */
+.row.selected {
+  background: var(--selected-bg);
+  box-shadow: none;
+}
+.row.selected .item-input { background: transparent; }
+.row.selected::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 5px;
+  bottom: 5px;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--selection-mark);
+  pointer-events: none;
+}
+
+/* Fold state is structural, not an accent-color event. */
+.fold-icon {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  margin-right: 3px;
+  border-radius: 3px;
+  color: var(--text-faint);
+}
+.fold-icon:hover { background: var(--surface-hover); color: var(--text-color); }
+.fold-icon.collapsed { color: #66665f; }
+.fold-icon.collapsed:hover { color: var(--text-color); background: var(--surface-hover); }
+.fold-icon.leaf { color: #cfcec7; }
+
+/* P0 overlap fix: editing space only reserves the check action.
+   Timestamps remain in DOM for metadata, but surface through row.title. */
+.input-wrapper { padding-right: 34px; }
 .row-actions {
+  right: 2px;
+  top: 2px;
+  width: 26px;
+  min-width: 26px;
   gap: 0;
-  min-width: 28px;
+  padding: 0;
+  background: transparent;
+  border-radius: 3px;
+  opacity: .24;
+  transition: opacity .11s ease;
+}
+.row:hover .row-actions,
+.row:focus-within .row-actions,
+.row.selected .row-actions { opacity: .9; background: transparent; }
+.created-at-label { display: none; }
+.action-icon.check {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: 3px;
+  color: var(--text-faint);
+}
+.action-icon.check:hover { color: var(--success-color); background: #f0f4f0; }
+
+/* Notes / links: useful, but visually secondary. */
+.item-note { color: var(--text-muted); }
+.note-link-btn {
+  color: #526b7c;
+  background: #f5f7f7;
+  border-color: #e3e8e9;
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+.note-link-btn:hover { background: #eef2f2; color: #344d5e; }
+
+/* Selection command bar: one neutral contextual strip, no SaaS-blue slab. */
+#selection-bar {
+  background: #f3f3ef;
+  border-top: 1px solid var(--border-color);
+  padding: 7px 12px;
+  color: #44443f;
+}
+.selection-summary { display: flex; align-items: center; min-width: 0; }
+#selection-count { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.btn-group { gap: 3px; }
+.btn-primary {
+  background: #33332f;
+  color: white;
+  border: 1px solid #33332f;
+  border-radius: 4px;
+  box-shadow: none;
+  font-weight: 600;
+  padding: 5px 10px;
+}
+.btn-primary:hover { background: #1f1f1c; border-color: #1f1f1c; }
+.btn-secondary {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+  border-radius: 4px;
+  padding: 5px 8px;
+}
+.btn-secondary:hover { background: #e9e9e4; color: var(--text-color); }
+
+/* Menus: neutral hover. Accent is reserved for actual links / jump feedback. */
+.mode-menu, .popup-menu {
+  border-color: var(--border-color);
+  border-radius: 5px;
+  box-shadow: 0 8px 24px rgba(35,35,32,.10);
+}
+.mode-menu-item, .popup-menu-item { border-radius: 3px; }
+.mode-menu-item:hover, .popup-menu-item:hover {
+  color: var(--text-color);
+  background: var(--surface-hover);
 }
 
-.action-icon.check,
-.control-btn,
-.footer-icon-btn,
-.tab-scroll-btn,
-#new-tab-btn {
-  min-width: 28px;
-  min-height: 28px;
-  touch-action: manipulation;
+/* Footer: quiet utility shelf. */
+footer {
+  min-height: 39px;
+  padding: 5px 9px;
+  background: rgba(248,248,245,.97);
+  border-top-color: var(--border-color);
+}
+.footer-icon-btn, .copy-all-btn { border-radius: 4px; }
+.footer-icon-btn:hover, .copy-all-btn:hover {
+  background: #eeeeea;
+  border-color: transparent;
 }
 
-button,
-.action-icon,
-.fold-icon,
-.tab,
-.mode-menu-item,
-.popup-menu-item,
-.color-swatch {
-  transition-property: background-color, border-color, color, opacity, box-shadow, transform;
-  transition-duration: .14s;
-  transition-timing-function: ease;
+/* Line numbers / jump: hierarchy without bright blue flashes. */
+.line-number { opacity: .46; color: var(--text-faint); }
+.row:hover .line-number { opacity: .72; color: var(--text-muted); }
+#btn-line-numbers.active {
+  color: var(--text-color);
+  background: var(--surface-hover);
+  border-color: transparent;
+}
+.line-jump-indicator {
+  border-color: var(--border-color);
+  background: rgba(255,255,255,.96);
+  color: var(--text-muted);
+  box-shadow: 0 4px 14px rgba(35,35,32,.07);
+}
+@keyframes line-jump-flash {
+  0% { background: #efefea; box-shadow: inset 2px 0 0 #5a5a54; }
+  100% { background: transparent; box-shadow: inset 0 0 0 transparent; }
 }
 
+/* Focus: clearly visible for keyboard users, but neutral instead of blue. */
 button:focus-visible,
 .action-icon:focus-visible,
 .fold-icon:focus-visible,
 .tab:focus-visible,
 .mode-menu-item:focus-visible,
 .popup-menu-item:focus-visible,
-.color-swatch:focus-visible,
+.color-swatch:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+  box-shadow: none;
+}
 .item-input:focus-visible,
-.item-note:focus-visible,
-.text-editor-area:focus-visible {
+.item-note:focus-visible {
   outline: none;
-  box-shadow: var(--focus-ring);
+  box-shadow: inset 0 -2px 0 var(--focus-color);
+  border-radius: 0;
 }
-
-.item-input:focus-visible,
-.item-note:focus-visible,
 .text-editor-area:focus-visible {
-  border-radius: 3px;
+  outline: 2px solid var(--focus-color);
+  outline-offset: -2px;
+  box-shadow: none;
+  border-radius: 2px;
 }
 
+/* Touch remains comfortably targetable without making desktop controls bulky. */
 @media (pointer: coarse) {
   .action-icon.check,
   .control-btn,
@@ -79,21 +282,30 @@ button:focus-visible,
     min-width: 32px;
     min-height: 32px;
   }
+  .input-wrapper { padding-right: 40px; }
+  .row-actions { width: 34px; min-width: 34px; }
+}
+
+@media (max-width: 330px) {
+  #editor { padding-right: 10px; }
+  #editor.line-numbers-visible { padding-left: 38px; }
+  .tab { max-width: 116px; padding-left: 7px; padding-right: 7px; }
+  #selection-bar { padding-left: 9px; padding-right: 9px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    scroll-behavior: auto !important;
-    animation-duration: .001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
+    scroll-behavior: auto;
+    animation-duration: .001ms;
+    animation-iteration-count: 1;
+    transition-duration: .001ms;
   }
 
   .instance-alert,
   .save-status[data-state="saving"] .save-status-dot,
   .row.line-jump-target {
-    animation: none !important;
+    animation: none;
   }
 }

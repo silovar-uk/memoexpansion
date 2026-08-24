@@ -23,6 +23,7 @@ function completeItem(index) {
     for (let i = 0; i < count; i++) currentTab.items[index + i].completed = true;
     const visibleItems = currentTab.items.filter(i => !i.completed);
     if (visibleItems.length === 0) currentTab.items.push(createOutlinerItem());
+    archiveCompletedItems(currentTab);
     markAsDirty(); 
     renderEditor(); 
     editor.scrollTop = scrollPos;
@@ -39,7 +40,10 @@ function countStars(text) {
 function sortItemsByStars() {
   const currentTab = tabs.find(t => t.id === activeTabId);
   if (!currentTab || currentTab.mode !== 'outliner') return;
-  if (currentTab.items.length <= 1) return;
+  archiveCompletedItems(currentTab);
+  const activeItems = currentTab.items.filter(item => !item.completed);
+  const completedItems = currentTab.items.filter(item => item.completed);
+  if (activeItems.length <= 1) return;
   pushHistory();
   function buildTree(itemList) {
     const root = { children: [] };
@@ -63,9 +67,9 @@ function sortItemsByStars() {
     });
     return resultList;
   }
-  const tree = buildTree(currentTab.items);
+  const tree = buildTree(activeItems);
   sortTree(tree);
-  currentTab.items = flattenTree(tree);
+  currentTab.items = flattenTree(tree).concat(completedItems);
   markAsDirty();
   renderEditor();
   saveData();

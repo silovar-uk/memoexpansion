@@ -65,7 +65,7 @@ function updateSelectionUI() {
   if (selectedItemIds.size > 0) {
     bar.classList.remove('hidden');
     bar.style.display = 'flex';
-    countSpan.textContent = `${selectedItemIds.size} items`;
+    countSpan.textContent = `${selectedItemIds.size}件選択`;
   } else {
     bar.classList.add('hidden');
     bar.style.display = 'none';

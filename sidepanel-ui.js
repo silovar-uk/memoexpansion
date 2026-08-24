@@ -138,11 +138,7 @@ function toggleFold(index, forceCollapse = null) {
   const currentTab = tabs.find(t => t.id === activeTabId);
   if (!currentTab || currentTab.mode !== 'outliner') return;
   const item = currentTab.items[index];
-  let hasChildren = false;
-  for (let i = index + 1; i < currentTab.items.length; i++) {
-    if (currentTab.items[i].depth <= item.depth) break;
-    if (!currentTab.items[i].completed) { hasChildren = true; break; }
-  }
+  const hasChildren = window.MemoOutlinerStructure.hasActiveChildren(currentTab.items, index);
   if (!hasChildren) return;
   pushHistory();
   item.collapsed = (forceCollapse !== null ? forceCollapse : !item.collapsed);
@@ -165,7 +161,9 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     const newValStr = changes.tabs.newValue || "[]";
     if (newValStr === lastSavedTabsJSON || isDirty || isEditing) return;
     if (newValStr !== JSON.stringify(tabs)) {
-      tabs = JSON.parse(newValStr); lastSavedTabsJSON = newValStr;
+      tabs = JSON.parse(newValStr);
+      lastSavedTabsJSON = newValStr;
+      if (archiveCompletedItemsInAllTabs()) markAsDirty();
       renderTabs(); renderEditor();
     }
   }

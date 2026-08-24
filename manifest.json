@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.1.0",
-  "description": "タブ切り替え・装飾・行番号ジャンプ・日時表示・詳細連動移動・1行自動縮小表示に対応したメモツール。内部安定性改善・三点メニュー撤去済み。",
+  "version": "2.1.7",
+  "description": "v2.1.6を正本化し、アウトライナー構造契約・テスト・CSS責務を固定したメモツール。ALT+A開閉と静かな高密度UIを維持。",
   "permissions": [
     "sidePanel",
     "storage",
@@ -26,5 +26,17 @@
   },
   "background": {
     "service_worker": "background.js"
-  }
+  },
+  "commands": {
+    "open-memo-panel": {
+      "suggested_key": {
+        "default": "Alt+A",
+        "windows": "Alt+A",
+        "linux": "Alt+A",
+        "mac": "Alt+A"
+      },
+      "description": "メモパネルを開閉し、開いたときは現在のメモにフォーカス"
+    }
+  },
+  "minimum_chrome_version": "142"
 }

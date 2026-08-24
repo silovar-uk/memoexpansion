@@ -59,13 +59,12 @@
 </div>
 
 <div id="selection-bar" class="hidden">
-  <div style="display:flex; align-items:center; gap:8px;">
-    <span id="selection-count" style="font-weight:bold;">0 items</span>
-    <span style="font-size:11px;">selected</span>
+  <div class="selection-summary">
+    <span id="selection-count">0件選択</span>
   </div>
   <div class="btn-group">
-    <button id="btn-selection-cancel" class="btn-secondary">Cancel</button>
-    <button id="btn-selection-move" class="btn-primary">Move...</button>
+    <button id="btn-selection-cancel" class="btn-secondary">解除</button>
+    <button id="btn-selection-move" class="btn-primary">移動</button>
   </div>
 </div>
 
@@ -86,6 +85,7 @@
   </div>
 </footer>
 
+<script src="outliner-structure.js"></script>
 <script src="sidepanel.js"></script>
 <script src="sidepanel-tabs.js"></script>
 <script src="sidepanel-render.js"></script>
@@ -95,6 +95,7 @@
 <script src="sidepanel-ui.js"></script>
 <script src="sidepanel-model.js"></script>
 <script src="sidepanel-runtime.js"></script>
+<script src="sidepanel-focus.js"></script>
 <script src="sidepanel-accessibility.js"></script>
 </body>
 </html>

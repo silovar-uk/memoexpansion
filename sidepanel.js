@@ -35,8 +35,8 @@ const LINE_JUMP_DELAY = 650;
 
 // --- アウトライナー本文の1行フィット表示 ---
 const OUTLINER_EDIT_FONT_SIZE = 14;
-const OUTLINER_PREFERRED_MIN_FONT_SIZE = 9;
-const OUTLINER_ABSOLUTE_MIN_FONT_SIZE = 0.1;
+const OUTLINER_PREFERRED_MIN_FONT_SIZE = 10.5;
+const OUTLINER_ABSOLUTE_MIN_FONT_SIZE = 10;
 let outlinerFitFrame = null;
 let outlinerResizeObserver = null;
 
@@ -87,6 +87,10 @@ function showTransientStatus(message, duration = 1500) {
 // --- 開発更新履歴 ---
 // 新しい履歴を配列の先頭（上）に追加していきます
 const appHistory = [
+  { date: '2026/08/23', text: '選択・フォーカス・タブ・行アクションを静かな高密度UIへ調整し、日時と本文の重なりを解消' },
+  { date: '2026/08/19', text: '完了項目をアクティブ構造から退避し、折りたたみ・上下移動を見えているツリー基準に修正' },
+  { date: '2026/08/17', text: 'ALT+AでSide Panelを開閉するトグル操作を追加' },
+  { date: '2026/08/17', text: 'ALT+Aを専用コマンド化し、ユーザー操作直後にSide Panelを開いて前回カーソル位置へ戻るよう修正' },
   { date: '2026/08/02', text: 'アウトライナー本文を1行表示にし、非編集中は横幅に合わせて文字サイズを自動調整' },
   { date: '2026/08/01', text: 'キーボードで行を上下移動した際、本文・詳細・リンク・日時が項目単位で連動するよう修正' },
   { date: '2026/07/29', text: '作成・更新日時をホバー／フォーカス時のみ表示し、更新日時を優先する仕様に変更' },
@@ -98,18 +102,41 @@ const appHistory = [
 
 // --- 初期化 ---
 
+// --- ALT+A起動要求 ---
+async function consumeShortcutFocusRequest() {
+  try {
+    let result = await chrome.storage.session.get('memoShortcutFocusRequest');
+    let request = result.memoShortcutFocusRequest;
+
+    // ALT+Aでは sidePanel.open() を最優先で呼ぶため、session書き込み完了より
+    // Side PanelのDOMContentLoadedがわずかに先行する可能性がある。1回だけ短く再確認する。
+    if (!request) {
+      await new Promise((resolve) => setTimeout(resolve, 60));
+      result = await chrome.storage.session.get('memoShortcutFocusRequest');
+      request = result.memoShortcutFocusRequest;
+    }
+
+    if (!request || typeof request.requestedAt !== 'number') return false;
+
+    await chrome.storage.session.remove('memoShortcutFocusRequest');
+    return Date.now() - request.requestedAt < 5000;
+  } catch (error) {
+    console.error('Failed to consume shortcut focus request:', error);
+    return false;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+  const openedByShortcut = await consumeShortcutFocusRequest();
   await loadData();
   await migrateLegacyData();
 
   if (tabs.length === 0) {
-    createNewTab('outliner');
+    // ALT+Aは「今あるメモへ戻る」操作。空なら勝手に新規メモを作らない。
+    if (!openedByShortcut) createNewTab('outliner');
   } else if (!activeTabId || !tabs.find(t => t.id === activeTabId)) {
-    if (tabs.length > 0) {
-      activeTabId = tabs[0].id;
-    } else {
-      createNewTab('outliner');
-    }
+    // 通常起動時だけ従来どおり先頭メモを補完。ALT+Aでは何も選ばない。
+    if (!openedByShortcut) activeTabId = tabs[0].id;
   }
 
   setupEventListeners();
@@ -118,6 +145,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderEditor();
   setupOutlinerFitResizeObserver();
   updateSaveStatus(isDirty ? 'dirty' : 'saved');
+
+  if (openedByShortcut) {
+    requestAnimationFrame(() => window.MemoFocus?.focusCurrentMemo());
+  }
 
   // 追加日時の相対表示だけを軽く更新（例: 3分前 → 4分前）
   setInterval(refreshCreatedAtLabels, 60000);
@@ -131,8 +162,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const el = document.getElementById('instance-count');
         if (el) el.textContent = `起動中: ${currentInstanceCount}つ`;
         updateInstanceAlert(); 
+      } else if (msg.type === 'FOCUS_CURRENT_MEMO') {
+        chrome.storage.session.remove('memoShortcutFocusRequest').catch(() => {});
+        window.MemoFocus?.focusCurrentMemo();
       }
     });
+    // listener登録後に準備完了を伝える。閉じた状態からALT+Aで開いた場合の
+    // フォーカス要求は、この合図を受けてbackgroundから再送される。
+    port.postMessage({ type: 'PANEL_READY_FOR_FOCUS' });
+
     port.onDisconnect.addListener(() => {
       setTimeout(connectToBackground, 2000);
     });
@@ -150,6 +188,21 @@ function markAsDirty() {
   updateSaveStatus('dirty');
 }
 
+// 完了項目は表示ツリーの構造計算から完全に外す。
+// pure helperは outliner-structure.js が所有し、ここは既存呼び出し向けの薄いadapterだけを持つ。
+function archiveCompletedItems(tab) {
+  if (!tab || !Array.isArray(tab.items)) return false;
+  return window.MemoOutlinerStructure.archiveCompletedItems(tab.items);
+}
+
+function archiveCompletedItemsInAllTabs() {
+  let changed = false;
+  for (const tab of tabs) {
+    if (archiveCompletedItems(tab)) changed = true;
+  }
+  return changed;
+}
+
 async function loadData() {
   try {
     const result = await chrome.storage.local.get(['tabs', 'activeTabId', 'showLineNumbers']);
@@ -162,6 +215,9 @@ async function loadData() {
         if (!t.mode) t.mode = 'outliner';
         if (!t.content) t.content = '';
       });
+
+      // 旧データで完了項目が途中に残っていても、表示ツリーから即座に退避する。
+      if (archiveCompletedItemsInAllTabs()) isDirty = true;
     }
     if (result.activeTabId) activeTabId = result.activeTabId;
     if (typeof result.showLineNumbers === 'boolean') {
@@ -173,6 +229,8 @@ async function loadData() {
 }
 
 async function saveData() {
+  // どの保存経路でも「未完了 → 完了アーカイブ」の順序を不変条件にする。
+  if (archiveCompletedItemsInAllTabs()) isDirty = true;
   if (!isDirty && tabs.length > 0) return;
 
   updateSaveStatus('saving');

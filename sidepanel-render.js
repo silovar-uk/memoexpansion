@@ -3,6 +3,7 @@
 function renderEditor() {
   const editor = document.getElementById('editor');
   const currentTab = tabs.find(t => t.id === activeTabId);
+  if (currentTab?.mode === 'outliner' && archiveCompletedItems(currentTab)) markAsDirty();
   if (!currentTab) {
     editor.innerHTML = '';
     editor.classList.remove('line-numbers-visible');
@@ -153,14 +154,7 @@ function renderEditor() {
     line.className = 'guide-line';
     line.style.left = (item.depth * 20) + 'px';
     
-    let hasChildren = false;
-    for (let i = index + 1; i < currentTab.items.length; i++) {
-      if (currentTab.items[i].depth <= item.depth) break;
-      if (!currentTab.items[i].completed) {
-        hasChildren = true;
-        break;
-      }
-    }
+    const hasChildren = window.MemoOutlinerStructure.hasActiveChildren(currentTab.items, index);
 
     if (hasChildren && item.collapsed) row.classList.add('is-collapsed-row');
 
@@ -248,6 +242,8 @@ function renderEditor() {
         item.updatedAt = now;
       }
       updateItemTimestampLabel(createdAtLabel, item);
+      if (createdAtLabel.title) row.title = createdAtLabel.title;
+      else row.removeAttribute('title');
       autoResize(e.target);
     };
     
@@ -297,6 +293,8 @@ function renderEditor() {
         item.updatedAt = now;
       }
       updateItemTimestampLabel(createdAtLabel, item);
+      if (createdAtLabel.title) row.title = createdAtLabel.title;
+      else row.removeAttribute('title');
       autoResize(e.target);
       renderNoteLinks(linkContainer, e.target.value);
     };
@@ -342,6 +340,9 @@ function renderEditor() {
     const createdAtLabel = document.createElement('span');
     createdAtLabel.className = 'created-at-label';
     updateItemTimestampLabel(createdAtLabel, item);
+    // Timestamp is secondary metadata: expose it via the row's native tooltip
+    // instead of consuming horizontal editing space.
+    if (createdAtLabel.title) row.title = createdAtLabel.title;
 
     actions.appendChild(createdAtLabel);
     actions.appendChild(btnCheck);

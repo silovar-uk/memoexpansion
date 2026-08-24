@@ -320,12 +320,7 @@ function moveFocus(currentIndex, direction) {
 }
 
 function getSubtreeCount(tab, index) {
-  const targetDepth = tab.items[index].depth;
-  let count = 1;
-  for (let i = index + 1; i < tab.items.length; i++) {
-    if (tab.items[i].depth > targetDepth) count++; else break;
-  }
-  return count;
+  return window.MemoOutlinerStructure.getSubtreeCount(tab?.items, index);
 }
 
 function moveItem(index, isUp) {
@@ -349,7 +344,7 @@ function moveItem(index, isUp) {
     items.splice(prevSiblingIdx, 0, ...mySubtree);
   } else {
     const nextSiblingIdx = index + myCount;
-    if (nextSiblingIdx >= items.length || items[nextSiblingIdx].depth !== item.depth) return;
+    if (nextSiblingIdx >= items.length || items[nextSiblingIdx].completed || items[nextSiblingIdx].depth !== item.depth) return;
     pushHistory();
     const siblingCount = getSubtreeCount(currentTab, nextSiblingIdx);
     const mySubtree = items.splice(index, myCount);
