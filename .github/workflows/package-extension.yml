@@ -34,10 +34,15 @@ jobs:
           node --check sidepanel-runtime.js
           node --check sidepanel-focus.js
           node --check sidepanel-accessibility.js
+          node --check sidepanel-shell.js
+          node --check tests/ui-shell-contract.test.js
           node --check tests/outliner-structure.test.js
 
       - name: Run structure characterization tests
         run: node tests/outliner-structure.test.js
+
+      - name: Run quiet shell contract test
+        run: node tests/ui-shell-contract.test.js
 
       - name: Validate removed menus and cleanup
         run: |
@@ -68,6 +73,8 @@ jobs:
             sidepanel-editor.css \
             sidepanel-components.css \
             sidepanel-maintenance.css \
+            sidepanel-shell.css \
+            sidepanel-shell.js \
             README_UPDATE.md \
             icons
 
@@ -75,12 +82,12 @@ jobs:
         run: |
           unzip -t memoexpansion-extension.zip
           unzip -Z1 memoexpansion-extension.zip | grep -qx 'manifest.json'
-          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.1.7"
+          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.2.0"
 
       - name: Upload extension ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: memoexpansion-extension-v2.1.7
+          name: memoexpansion-extension-v2.2.0
           path: memoexpansion-extension.zip
           if-no-files-found: error
           retention-days: 30
