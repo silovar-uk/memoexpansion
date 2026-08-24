@@ -1,8 +1,8 @@
 # MemoTool — Current Behavior Contract
 
-Baseline: **v2.1.7**  
-Canonical behavior source: **v2.1.6 user-visible behavior, formalized in v2.1.7**  
-Updated: **2026-08-24**
+Baseline: **v2.2.0**  
+Canonical behavior source: **v2.1.7 behavior contract + v2.2.0 Quiet Shell presentation decision**  
+Updated: **2026-08-25**
 
 This file is a regression contract. Refactors may reorganize code, but must not change the behaviors below unless a later product decision explicitly updates this contract.
 
@@ -15,6 +15,17 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - When opening through `Alt+A`, the panel returns to the current memo and attempts to restore the last caret/selection position.
 - If there is no existing memo, `Alt+A` does not create a memo merely because the panel was opened.
 - Caret state is session-only and may be discarded safely; memo content remains the source of truth in local storage.
+
+## Quiet Shell
+
+- The dedicated `memo tool / 起動中` header row is no longer persistent UI.
+- The tab strip is the topmost persistent navigation surface.
+- Line-number toggle, star sort and new-tab controls live beside the tab strip as contextual utilities.
+- Line-number toggle and star sort are visible only while an outliner tab is active.
+- Single-instance state is visually silent.
+- Multiple Side Panel instances are surfaced only when the background reports two or more connected panels.
+- `sidepanel-shell.css` owns persistent top-chrome presentation.
+- `sidepanel-shell.js` may adapt existing global shell functions but must not own memo content, storage mutation, tab CRUD or outliner structure.
 
 ## Tabs
 
@@ -67,10 +78,10 @@ Pure structural ownership lives in `outliner-structure.js`.
 
 - Memo state is stored in `chrome.storage.local` using the existing `tabs`, `activeTabId` and related keys.
 - Local rendering may mark state dirty before persistence.
-- Existing dirty/saving/saved UI remains the user-facing save confidence mechanism.
 - Save paths normalize the completed archive before writing.
 - External storage updates must not blindly replace locally dirty or actively edited state.
 - Context-menu capture inserts a new active outliner item before the completed archive.
+- Save-state functions and styles exist, but v2.2.0 does **not** mount a persistent `#save-status` element in the Side Panel. Do not treat visual save confirmation as an existing user-facing contract until it is deliberately restored or redesigned.
 
 ## Compatibility rule
 
