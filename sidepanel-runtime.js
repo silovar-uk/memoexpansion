@@ -2,6 +2,7 @@
   'use strict';
 
   const maintenance = window.MemoMaintenance || (window.MemoMaintenance = {});
+  const saveState = window.MemoSaveState;
   const SAVE_DEBOUNCE_MS = 180;
   let saveTimer = null;
   let saveInFlight = Promise.resolve();
@@ -20,19 +21,22 @@
 
   async function persistSnapshot() {
     maintenance.normalizeState?.();
-    const tabsSnapshot = JSON.stringify(tabs);
-    const activeTabSnapshot = activeTabId;
+    const snapshot = saveState.createSnapshot(tabs, activeTabId);
     updateSaveStatus('saving');
 
     await chrome.storage.local.set({
-      tabs: tabsSnapshot,
-      activeTabId: activeTabSnapshot
+      tabs: snapshot.tabsJSON,
+      activeTabId: snapshot.activeTabId
     });
 
-    lastSavedTabsJSON = tabsSnapshot;
-    const stateStillMatches = JSON.stringify(tabs) === tabsSnapshot && activeTabId === activeTabSnapshot;
-    isDirty = !stateStillMatches;
-    updateSaveStatus(isDirty ? 'dirty' : 'saved');
+    lastSavedTabsJSON = snapshot.tabsJSON;
+    const nextState = saveState.stateAfterPersist(snapshot, tabs, activeTabId);
+    isDirty = nextState === 'dirty';
+    updateSaveStatus(nextState);
+
+    // Saving is serialized. If the user typed or switched tabs while the write was
+    // in flight, the just-written snapshot is valid but already stale: immediately
+    // queue the newer state rather than clearing dirty by accident.
     if (isDirty && saveTimer === null) scheduleFlush();
   }
 
@@ -41,10 +45,11 @@
       clearTimeout(saveTimer);
       saveTimer = null;
     }
-    if (!isDirty && Array.isArray(tabs) && tabs.length > 0) {
+    if (!isDirty) {
       resolveWaiters(pendingSaveWaiters.splice(0));
       return;
     }
+
     const waiters = pendingSaveWaiters.splice(0);
     saveInFlight = saveInFlight.catch(() => {}).then(() => persistSnapshot());
     try {
@@ -58,15 +63,21 @@
     }
   }
 
-  if (typeof saveData === 'function') {
+  if (typeof saveData === 'function' && saveState) {
     saveData = function debouncedSaveData() {
-      if (!isDirty && Array.isArray(tabs) && tabs.length > 0) return Promise.resolve();
+      if (!isDirty) return Promise.resolve();
       const promise = new Promise((resolve, reject) => pendingSaveWaiters.push({ resolve, reject }));
       scheduleFlush();
       return promise;
     };
 
     maintenance.flushSaveData = flushSaveData;
+    maintenance.getSaveRuntimeState = () => ({
+      isDirty,
+      hasDebounceTimer: saveTimer !== null,
+      pendingWaiterCount: pendingSaveWaiters.length
+    });
+
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden' && isDirty) {
         flushSaveData().catch((error) => console.error('Visibility save failed:', error));
