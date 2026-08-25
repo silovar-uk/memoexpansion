@@ -46,6 +46,7 @@ jobs:
           node --check tests/text-canvas-contract.test.js
           node --check tests/cool-precision-contract.test.js
           node --check tests/ui-architecture-contract.test.js
+          node --check tests/interaction-precision-contract.test.js
           node --check tests/outliner-structure.test.js
 
       - name: Run structure characterization tests
@@ -72,6 +73,9 @@ jobs:
 
       - name: Run UI architecture contract test
         run: node tests/ui-architecture-contract.test.js
+
+      - name: Run interaction precision contract test
+        run: node tests/interaction-precision-contract.test.js
 
       - name: Validate removed menus and cleanup
         run: |
@@ -115,12 +119,12 @@ jobs:
         run: |
           unzip -t memoexpansion-extension.zip
           unzip -Z1 memoexpansion-extension.zip | grep -qx 'manifest.json'
-          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.4.3"
+          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.4.4"
 
       - name: Upload extension ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: memoexpansion-extension-v2.4.3
+          name: memoexpansion-extension-v2.4.4
           path: memoexpansion-extension.zip
           if-no-files-found: error
           retention-days: 30
