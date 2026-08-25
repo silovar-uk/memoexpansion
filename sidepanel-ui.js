@@ -3,12 +3,74 @@ let copyAllFeedbackTimer = null;
 function setupEventListeners() {
   const menuBtn = document.getElementById('new-tab-btn');
   const menu = document.getElementById('new-tab-menu');
-  menuBtn.onclick = (e) => { e.stopPropagation(); menu.style.display = (menu.style.display === 'flex' ? 'none' : 'flex'); };
-  document.addEventListener('click', () => {
+  const menuItems = [
+    document.getElementById('menu-outliner'),
+    document.getElementById('menu-text')
+  ].filter(Boolean);
+
+  const isNewTabMenuOpen = () => menu?.style.display === 'flex';
+  const closeNewTabMenu = ({ returnFocus = false } = {}) => {
+    if (!menu || !isNewTabMenuOpen()) return;
     menu.style.display = 'none';
-  });
+    menuBtn?.setAttribute('aria-expanded', 'false');
+    if (returnFocus && menuBtn) menuBtn.focus({ preventScroll: true });
+  };
+  const openNewTabMenu = ({ keyboard = false } = {}) => {
+    if (!menu) return;
+    menu.style.display = 'flex';
+    menuBtn?.setAttribute('aria-expanded', 'true');
+    if (keyboard && menuItems[0]) {
+      requestAnimationFrame(() => menuItems[0].focus({ preventScroll: true }));
+    }
+  };
+
+  if (menuBtn && menu) {
+    menu.setAttribute('role', 'menu');
+    menuBtn.setAttribute('aria-haspopup', 'menu');
+    menuBtn.setAttribute('aria-expanded', 'false');
+
+    menuItems.forEach((item, index) => {
+      item.setAttribute('role', 'menuitem');
+      item.tabIndex = -1;
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+          event.preventDefault();
+          const delta = event.key === 'ArrowDown' ? 1 : -1;
+          const next = (index + delta + menuItems.length) % menuItems.length;
+          menuItems[next].focus({ preventScroll: true });
+        } else if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          item.click();
+        } else if (event.key === 'Escape') {
+          event.preventDefault();
+          closeNewTabMenu({ returnFocus: true });
+        }
+      });
+    });
+
+    menuBtn.onclick = (event) => {
+      event.stopPropagation();
+      if (isNewTabMenuOpen()) {
+        closeNewTabMenu();
+      } else {
+        openNewTabMenu({ keyboard: event.detail === 0 });
+      }
+    };
+
+    document.addEventListener('click', (event) => {
+      if (!isNewTabMenuOpen()) return;
+      if (event.target === menuBtn || menu.contains(event.target)) return;
+      closeNewTabMenu();
+    });
+  }
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      if (isNewTabMenuOpen()) {
+        e.preventDefault();
+        closeNewTabMenu({ returnFocus: true });
+        return;
+      }
       clearLineJumpBuffer();
       return;
     }
@@ -19,8 +81,16 @@ function setupEventListeners() {
     isRowDragHandleDown = false;
   });
 
-  document.getElementById('menu-outliner').onclick = () => createNewTab('outliner');
-  document.getElementById('menu-text').onclick = () => createNewTab('text');
+  const outlinerMenuItem = document.getElementById('menu-outliner');
+  if (outlinerMenuItem) outlinerMenuItem.onclick = () => {
+    closeNewTabMenu();
+    createNewTab('outliner');
+  };
+  const textMenuItem = document.getElementById('menu-text');
+  if (textMenuItem) textMenuItem.onclick = () => {
+    closeNewTabMenu();
+    createNewTab('text');
+  };
   document.getElementById('btn-undo').onclick = undo;
   document.getElementById('btn-redo').onclick = redo;
   document.getElementById('btn-selection-cancel').onclick = () => { selectedItemIds.clear(); renderEditor(); };
