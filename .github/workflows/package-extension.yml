@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - v2.5.0-intent-reliability-coherence
   workflow_dispatch:
 
 permissions:
@@ -23,6 +24,7 @@ jobs:
         run: |
           node --check background.js
           node --check outliner-structure.js
+          node --check recovery-state.js
           node --check save-state.js
           node --check tab-navigation-core.js
           node --check sidepanel.js
@@ -33,6 +35,7 @@ jobs:
           node --check sidepanel-meta.js
           node --check sidepanel-ui.js
           node --check sidepanel-model.js
+          node --check sidepanel-recovery.js
           node --check sidepanel-runtime.js
           node --check sidepanel-focus.js
           node --check sidepanel-accessibility.js
@@ -48,6 +51,9 @@ jobs:
           node --check tests/ui-architecture-contract.test.js
           node --check tests/interaction-precision-contract.test.js
           node --check tests/layout-resilience-contract.test.js
+          node --check tests/recovery-state.test.js
+          node --check tests/recovery-contract.test.js
+          node --check tests/version-coherence.test.js
           node --check tests/outliner-structure.test.js
 
       - name: Run structure characterization tests
@@ -81,6 +87,14 @@ jobs:
       - name: Run layout resilience contract test
         run: node tests/layout-resilience-contract.test.js
 
+      - name: Run recovery confidence tests
+        run: |
+          node tests/recovery-state.test.js
+          node tests/recovery-contract.test.js
+
+      - name: Run version coherence test
+        run: node tests/version-coherence.test.js
+
       - name: Validate removed menus and cleanup
         run: |
           ! grep -RE "menu-toggle|action-buttons|footer-menu|btn-footer-menu|btn-force-reload|btn-copy-clipboard|btn-download-(txt|md)|showMoveTabMenu|showColorPalette|moveItemToTop|moveItemToBottom|moveItemToTab|copyItem\\(|action-menu-pinned|sidepanel-enter-fix|sidepanel-bootstrap|sidepanel-ui-cleanup" --include='*.js' --include='*.html' --include='*.css' .
@@ -93,6 +107,7 @@ jobs:
             manifest.json \
             background.js \
             outliner-structure.js \
+            recovery-state.js \
             save-state.js \
             tab-navigation-core.js \
             sidepanel.html \
@@ -104,6 +119,7 @@ jobs:
             sidepanel-meta.js \
             sidepanel-ui.js \
             sidepanel-model.js \
+            sidepanel-recovery.js \
             sidepanel-runtime.js \
             sidepanel-focus.js \
             sidepanel-accessibility.js \
@@ -111,6 +127,7 @@ jobs:
             sidepanel-shell.js \
             sidepanel-navigation.css \
             sidepanel-navigation.js \
+            sidepanel-recovery.css \
             sidepanel-base.css \
             sidepanel-tabs.css \
             sidepanel-editor.css \
@@ -123,12 +140,12 @@ jobs:
         run: |
           unzip -t memoexpansion-extension.zip
           unzip -Z1 memoexpansion-extension.zip | grep -qx 'manifest.json'
-          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.4.5"
+          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.5.0"
 
       - name: Upload extension ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: memoexpansion-extension-v2.4.5
+          name: memoexpansion-extension-v2.5.0
           path: memoexpansion-extension.zip
           if-no-files-found: error
           retention-days: 30
