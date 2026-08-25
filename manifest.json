@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.4.1",
-  "description": "テキストメモの横スクロールと強いフォーカス枠を抑え、文章そのものに集中できるQuiet Text Canvas版MemoTool。",
+  "version": "2.4.2",
+  "description": "余白を最適化し、本文は白のままShellとFooterを薄い青灰色で精密に整えたCool Precision版MemoTool。",
   "permissions": [
     "sidePanel",
     "storage",
