@@ -1,0 +1,36 @@
+.storage-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 26px;
+  padding: 0 7px;
+  border: 1px solid color-mix(in srgb, var(--danger-color) 28%, var(--border-color));
+  border-radius: 4px;
+  background: transparent;
+  color: var(--danger-color);
+  font-size: 10.5px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.storage-retry-btn:hover {
+  background: #fef2f2;
+  color: var(--danger-color);
+}
+
+.storage-retry-btn:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+.storage-retry-btn[hidden] {
+  display: none;
+}
+
+@media (max-width: 330px) {
+  .storage-retry-btn {
+    min-width: 36px;
+    padding: 0 5px;
+  }
+}
