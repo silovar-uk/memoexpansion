@@ -19,10 +19,8 @@ assert(editorCss.includes('border-color: rgba(85,85,79,.12)'));
 assert(editorCss.includes('.text-editor-area::selection'));
 assert(!editorCss.includes('.text-editor-area {\n    width: 100%;\n    height: 100%;\n    border: none;'));
 
-// Legacy maintenance focus may remain during the migration release, but the
-// owner stylesheet must use higher specificity and a quiet cue instead of the
-// old dark 2px frame.
-assert(maintenanceCss.includes('.text-editor-area:focus-visible'));
+// v2.4.3 finishes focus ownership migration: the legacy dark frame is gone.
+assert(!maintenanceCss.includes('.text-editor-area:focus-visible'));
 assert(editorCss.indexOf('#editor > .text-editor-area:focus-visible') !== -1);
 
 console.log('text-canvas-contract.test.js: 14/14 passed');
