@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.4.4",
-  "description": "タブ切替・新規メモ・メニュー操作のfocusとscrollを自然につなげたInteraction Precision版MemoTool。",
+  "version": "2.4.5",
+  "description": "狭幅・大量タブ・深い階層・画面端でも操作と現在位置を保つLayout Resilience版MemoTool。",
   "permissions": [
     "sidePanel",
     "storage",
