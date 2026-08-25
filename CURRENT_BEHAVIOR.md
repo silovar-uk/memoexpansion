@@ -1,7 +1,7 @@
 # MemoTool — Current Behavior Contract
 
-Baseline: **v2.4.1**  
-Canonical behavior source: **v2.1.7 behavior contract + v2.2.0 Quiet Shell + v2.3.0 Save Confidence + v2.4.0 Navigation Confidence + v2.4.1 Quiet Text Canvas**  
+Baseline: **v2.4.4**  
+Canonical behavior source: **v2.1.7 behavior contract + v2.2.0 Quiet Shell + v2.3.0 Save Confidence + v2.4.0 Navigation Confidence + v2.4.1 Quiet Text Canvas + v2.4.4 Interaction Precision**  
 Updated: **2026-08-25**
 
 This file is a regression contract. Refactors may reorganize code, but must not change the behaviors below unless a later product decision explicitly updates this contract.
@@ -12,9 +12,9 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - `Alt+A` is the dedicated `open-memo-panel` command.
 - `Alt+A`: closed -> open; open -> close.
 - `chrome.sidePanel.open()` must be started inside the original eligible command/user-gesture turn. Do not insert an `await` before it.
-- When opening through `Alt+A`, the panel returns to the current memo and attempts to restore the last caret/selection position.
+- When opening through `Alt+A`, the panel returns to the current memo and attempts to restore the last caret/selection/scroll context.
 - If there is no existing memo, `Alt+A` does not create a memo merely because the panel was opened.
-- Caret state is session-only and may be discarded safely; memo content remains the source of truth in local storage.
+- Caret and scroll context are session-only and may be discarded safely; memo content remains the source of truth in local storage.
 
 ## Quiet Shell
 
@@ -35,10 +35,24 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - Empty-query results preserve the existing tab order.
 - When opening with an empty query, the current tab is selected if present.
 - Arrow Up/Down moves the selected candidate, Enter activates it, and Escape closes the switcher.
-- Activating a candidate reuses the existing `switchTab()` behavior and then returns focus to the current memo.
+- Activating a different candidate reuses the existing `switchTab()` behavior; focus restoration is owned by the shared MemoFocus continuity path rather than duplicated inside Quick Switch.
+- Activating the already-current candidate closes Quick Switch and returns focus to the current memo.
 - Quick Switch does not reorder tabs, mutate tab metadata, create storage keys or persist navigation history.
 - `tab-navigation-core.js` owns DOM-free title normalization/filtering and result-index movement.
 - `sidepanel-navigation.js` owns the temporary switcher UI only; it does not own tab CRUD or persistence.
+
+## Interaction Precision
+
+- Before an actual tab switch or new-tab creation replaces the editor DOM, MemoFocus captures the current memo's caret context and current vertical scroll position when available.
+- Text Mode restores the textarea's vertical scroll position; Outliner restores the `#editor` vertical scroll position.
+- Interaction continuity state remains in the existing `chrome.storage.session` caret map. v2.4.4 adds no `chrome.storage.local` key and no persistent navigation history.
+- After switching to a different tab, focus returns to that tab's remembered editing target or the established fallback target.
+- After creating a new memo, focus moves into that memo's writing/editing surface so the next action can be typing.
+- New-tab mode choices expose menu/menuitem semantics for keyboard use.
+- When the new-tab menu is opened from keyboard activation, focus enters the first mode choice; Arrow Up/Down moves between choices and Enter/Space activates the choice.
+- Escape closes the new-tab menu and returns focus to the new-tab trigger.
+- Clicking outside the new-tab menu closes it without forcibly stealing focus from the clicked destination.
+- Interaction Precision must not introduce decorative animation, new layout chrome, new local-storage schema or a second tab-switch implementation.
 
 ## Quiet Text Canvas
 
@@ -59,6 +73,7 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - Tab rename, close, reorder and mode switching remain available.
 - `activeTabId` identifies the current tab and is persisted with memo state.
 - Switching tabs is itself a persisted state change: `activeTabId` must mark the app dirty before a save is scheduled.
+- Tab switching must preserve the outgoing memo's session-only focus/scroll context before rerender and restore the incoming memo context after rerender.
 
 ## Outliner model
 
@@ -94,6 +109,7 @@ Pure structural ownership lives in `outliner-structure.js`.
 - Multi-selection remains available through the current pointer interaction.
 - Selection commands remain `解除` and `移動` in the current UI.
 - Keyboard focus must remain visibly identifiable even though the visual language is neutral rather than blue.
+- `sidepanel-focus.js` owns session-only caret and vertical-scroll continuity across tab/new-memo transitions and shortcut restoration.
 
 ## Undo / redo
 
