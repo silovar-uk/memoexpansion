@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - v2.5.0-save-failure-recovery-confidence
   workflow_dispatch:
 
 permissions:
@@ -43,6 +44,7 @@ jobs:
           node --check tests/ui-shell-contract.test.js
           node --check tests/save-state.test.js
           node --check tests/save-contract.test.js
+          node --check tests/save-recovery-flow.test.js
           node --check tests/tab-navigation.test.js
           node --check tests/navigation-contract.test.js
           node --check tests/text-canvas-contract.test.js
@@ -66,6 +68,7 @@ jobs:
         run: |
           node tests/save-state.test.js
           node tests/save-contract.test.js
+          node tests/save-recovery-flow.test.js
 
       - name: Run navigation confidence tests
         run: |
