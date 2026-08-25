@@ -43,18 +43,6 @@
   .mode-btn { color: var(--text-muted); }
   .mode-btn.active { color: var(--accent-color); background: var(--surface); }
 
-  #tab-header-area { background: #ececea; }
-  .tab { color: var(--text-muted); }
-  .tab.active { color: var(--text-color); }
-  .tab.drag-over { border-left-color: var(--accent-color); }
-  .close-tab-btn:hover { background: #fef2f2; color: var(--danger-color); }
-  #new-tab-btn {
-    width: 26px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-  }
-  #new-tab-btn:hover { color: var(--accent-color); background: rgba(255,255,255,.7); }
   .mode-menu, .popup-menu { border-color: var(--border-color); }
   .mode-menu-item, .popup-menu-item { color: var(--text-color); }
   .mode-menu-item:hover, .popup-menu-item:hover {
@@ -98,9 +86,11 @@
 
   footer {
     position: relative;
-    min-height: 42px;
-    padding: 6px 10px;
-    background: rgba(250, 250, 249, .96);
+    min-height: 39px;
+    padding: 5px 9px;
+    background: rgba(241,246,249,.97);
+    border-top-color: var(--chrome-border);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.58);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -117,14 +107,14 @@
     height: 28px;
     padding: 0;
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: 4px;
     color: var(--text-muted);
   }
   .footer-icon-btn svg { width: 16px; height: 16px; }
   .footer-icon-btn:hover {
     color: var(--text-color);
-    background: var(--surface-hover);
-    border-color: var(--border-color);
+    background: var(--chrome-surface-strong);
+    border-color: transparent;
   }
   .footer-icon-btn:disabled { opacity: .35; cursor: default; background: transparent; border-color: transparent; }
 
@@ -136,7 +126,7 @@
     height: 28px;
     padding: 0 8px;
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: 4px;
     background: transparent;
     color: var(--text-muted);
     font-size: 11px;
@@ -146,8 +136,8 @@
   .copy-all-btn svg { width: 14px; height: 14px; }
   .copy-all-btn:hover {
     color: var(--text-color);
-    background: var(--surface-hover);
-    border-color: var(--border-color);
+    background: var(--chrome-surface-strong);
+    border-color: transparent;
   }
   .copy-all-btn.copied {
     color: var(--success-color);
@@ -213,8 +203,6 @@
   .tab.tab-bg-yellow { background-color: #f8f1d8; }
   .tab.tab-bg-purple { background-color: #f0e8f8; }
 
-  #editor { transition: padding-left .16s ease; }
-  #editor.line-numbers-visible { padding-left: 44px; }
   .line-number {
     position: absolute;
     left: -30px;
