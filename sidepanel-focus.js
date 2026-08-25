@@ -43,6 +43,22 @@
       : document.getElementById('editor');
   }
 
+  function rememberFocusStateFromElement(element) {
+    if (!activeTabId) return null;
+    const currentTab = tabs.find((tab) => tab.id === activeTabId);
+    if (!currentTab) return null;
+
+    const state = snapshotFromElement(element);
+    if (!state) return null;
+
+    const scrollOwner = scrollOwnerForTab(currentTab);
+    if (scrollOwner && Number.isFinite(scrollOwner.scrollTop)) {
+      state.scrollTop = scrollOwner.scrollTop;
+    }
+    focusByTabId[activeTabId] = state;
+    return state;
+  }
+
   async function writeCurrentFocusNow() {
     if (saveTimer !== null) {
       clearTimeout(saveTimer);
@@ -53,18 +69,17 @@
     const currentTab = tabs.find((tab) => tab.id === activeTabId);
     if (!currentTab) return;
 
-    let state = snapshotFromElement(document.activeElement);
+    let state = rememberFocusStateFromElement(document.activeElement);
     if (!state && focusByTabId[activeTabId]) {
       state = { ...focusByTabId[activeTabId], savedAt: Date.now() };
+      const scrollOwner = scrollOwnerForTab(currentTab);
+      if (scrollOwner && Number.isFinite(scrollOwner.scrollTop)) {
+        state.scrollTop = scrollOwner.scrollTop;
+      }
+      focusByTabId[activeTabId] = state;
     }
     if (!state) return;
 
-    const scrollOwner = scrollOwnerForTab(currentTab);
-    if (scrollOwner && Number.isFinite(scrollOwner.scrollTop)) {
-      state.scrollTop = scrollOwner.scrollTop;
-    }
-
-    focusByTabId[activeTabId] = state;
     try {
       await chrome.storage.session.set({ [STORAGE_KEY]: focusByTabId });
     } catch (error) {
@@ -203,6 +218,9 @@
     document.addEventListener(eventName, scheduleFocusSave, true);
   });
   document.addEventListener('selectionchange', scheduleFocusSave, true);
+  document.addEventListener('focusout', (event) => {
+    rememberFocusStateFromElement(event.target);
+  }, true);
 
   window.addEventListener('pagehide', () => {
     writeCurrentFocusNow().catch(() => {});
