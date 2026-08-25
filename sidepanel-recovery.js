@@ -9,6 +9,7 @@
   let lastLoadFailureReason = null;
   let recoveryButton = null;
   let retryInFlight = false;
+  let lastRetryFailed = false;
 
   const baseUpdateSaveStatus = typeof updateSaveStatus === 'function' ? updateSaveStatus : null;
   const baseLoadData = typeof loadData === 'function' ? loadData : null;
@@ -36,7 +37,7 @@
     const button = ensureRecoveryButton();
     const status = document.getElementById('save-status');
     const loadFailure = storageRecoveryBlocked;
-    const saveFailure = state === 'error' && !loadFailure;
+    const saveFailure = (state === 'error' || lastRetryFailed) && !loadFailure;
 
     if (button) {
       button.hidden = !(loadFailure || saveFailure);
@@ -66,6 +67,7 @@
         syncRecoveryUI('error');
         return;
       }
+      if (state !== 'error') lastRetryFailed = false;
       baseUpdateSaveStatus(state, customText);
       syncRecoveryUI(state);
     };
@@ -120,6 +122,7 @@
   async function retryStorageOperation() {
     if (retryInFlight) return;
     retryInFlight = true;
+    lastRetryFailed = false;
     syncRecoveryUI(storageRecoveryBlocked ? 'error' : (isDirty ? 'error' : 'saved'));
 
     try {
@@ -164,11 +167,12 @@
       }
       updateSaveStatus(isDirty ? 'dirty' : 'saved');
     } catch (error) {
+      lastRetryFailed = true;
       console.error('Storage recovery retry failed:', error);
-      updateSaveStatus('error');
+      if (baseUpdateSaveStatus) baseUpdateSaveStatus('error');
     } finally {
       retryInFlight = false;
-      syncRecoveryUI(storageRecoveryBlocked ? 'error' : (isDirty ? 'dirty' : 'saved'));
+      syncRecoveryUI(storageRecoveryBlocked || lastRetryFailed ? 'error' : (isDirty ? 'dirty' : 'saved'));
     }
   }
 
@@ -176,7 +180,8 @@
   maintenance.getStorageRecoveryState = () => ({
     blocked: storageRecoveryBlocked,
     reason: lastLoadFailureReason,
-    retryInFlight
+    retryInFlight,
+    lastRetryFailed
   });
   maintenance.retryStorageOperation = retryStorageOperation;
 
