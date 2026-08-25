@@ -1,7 +1,7 @@
 # MemoTool — Current Behavior Contract
 
-Baseline: **v2.4.0**  
-Canonical behavior source: **v2.1.7 behavior contract + v2.2.0 Quiet Shell + v2.3.0 Save Confidence + v2.4.0 Navigation Confidence**  
+Baseline: **v2.4.1**  
+Canonical behavior source: **v2.1.7 behavior contract + v2.2.0 Quiet Shell + v2.3.0 Save Confidence + v2.4.0 Navigation Confidence + v2.4.1 Quiet Text Canvas**  
 Updated: **2026-08-25**
 
 This file is a regression contract. Refactors may reorganize code, but must not change the behaviors below unless a later product decision explicitly updates this contract.
@@ -39,6 +39,18 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - Quick Switch does not reorder tabs, mutate tab metadata, create storage keys or persist navigation history.
 - `tab-navigation-core.js` owns DOM-free title normalization/filtering and result-index movement.
 - `sidepanel-navigation.js` owns the temporary switcher UI only; it does not own tab CRUD or persistence.
+
+## Quiet Text Canvas
+
+- Text Mode is treated as a writing surface rather than a boxed form control.
+- Normal text flow is vertical: text wraps to the available Side Panel width and does not rely on horizontal scrolling.
+- Long URLs and long unbroken strings may break to preserve readable content inside the panel rather than creating horizontal overflow.
+- The Text Mode textarea is the single vertical scrolling surface for the writing canvas; the surrounding editor viewport does not add a competing scrollbar.
+- Vertical scrolling remains available. Its scrollbar is thin, neutral and secondary to the text; the horizontal scrollbar is not part of the normal Text Mode interaction.
+- Mouse/text-entry focus must not surface a dark browser-style perimeter. Focus remains perceivable through a very low-contrast neutral cue.
+- Text selection uses a neutral selection color rather than a bright application accent.
+- Text Canvas rules are scoped to `.text-editor-area`; they must not alter Outliner `.item-input` or `.item-note` overflow/focus behavior.
+- `sidepanel-editor.css` is the long-term owner of Text Canvas presentation.
 
 ## Tabs
 
