@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - v2.5.1-failure-injection-readiness
   workflow_dispatch:
 
 permissions:
