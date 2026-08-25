@@ -1,6 +1,6 @@
 # MemoTool — CSS Ownership Map
 
-Baseline: **v2.4.0**  
+Baseline: **v2.4.1**  
 Updated: **2026-08-25**
 
 The UI is split by responsibility. A selector should have one long-term owner. `sidepanel-maintenance.css` remains a refinement/migration layer, not a permanent dumping ground.
@@ -53,6 +53,8 @@ Final persistent shell geometry is allowed to be specialized by `sidepanel-shell
 
 Owns:
 - editor viewport;
+- Quiet Text Canvas presentation and Text Mode scrolling;
+- Text Mode wrapping, focus cue, selection color and textarea scrollbar styling;
 - outliner row geometry;
 - fold/guide structure;
 - item text/note/link presentation;
@@ -60,7 +62,17 @@ Owns:
 - selection bar and primary editor action geometry;
 - text/editor background variants.
 
-The v2.1.6 overlap fix and neutral selection language remain accepted behavior and should eventually be promoted here after visual regression coverage exists.
+Quiet Text Canvas contract in v2.4.1:
+- Text Mode wraps within Side Panel width using `pre-wrap` + `overflow-wrap:anywhere` rather than depending on horizontal scrolling;
+- `.text-editor-area` owns vertical scrolling while the surrounding `#editor` suppresses a competing scroll surface in Text Mode;
+- vertical scrollbar styling remains thin and neutral, while the horizontal scrollbar is not part of normal Text Mode interaction;
+- Text Mode focus uses a low-contrast neutral cue rather than the inherited dark 2px perimeter;
+- selection, caret and placeholder colors remain subordinate to body text;
+- rules remain scoped to `.text-editor-area` so Outliner input behavior is unchanged.
+
+The legacy `.text-editor-area:focus-visible` declaration still exists in `sidepanel-maintenance.css` during this patch release. The higher-specificity owner rule in `sidepanel-editor.css` deliberately supersedes it. Remove the inert legacy declaration in a cleanup-only release rather than mixing broad maintenance-file surgery into this UI patch.
+
+The v2.1.6 overlap fix and neutral Outliner selection language remain accepted behavior and should eventually be promoted here after visual regression coverage exists.
 
 ## `sidepanel-components.css`
 
@@ -84,7 +96,7 @@ It contains accepted visual language such as:
 - footer refinement;
 - narrow-width adjustments.
 
-Some historical tab/header rules are superseded by the explicit `sidepanel-shell.css` owner.
+Some historical tab/header rules are superseded by the explicit `sidepanel-shell.css` owner. Its old Text Mode focus declaration is also superseded by the v2.4.1 `sidepanel-editor.css` owner and should not receive further Text Canvas changes.
 
 Rules:
 1. Do not add a new broad visual theme here by default.
@@ -93,11 +105,12 @@ Rules:
 4. After migration, delete duplicate maintenance rules rather than accumulating override pairs.
 5. Visual behavior must remain unchanged during ownership-only migration.
 
-## Ownership migration order after v2.4.0
+## Ownership migration order after v2.4.1
 
 Recommended:
-1. remove dead legacy header/status CSS after confirming Quiet Shell stability;
-2. promote row/action overlap + selection -> `sidepanel-editor.css`;
-3. consolidate remaining reusable line-number/footer utilities -> `sidepanel-components.css` without changing Save Confidence behavior;
-4. prune superseded tab rules from `sidepanel-maintenance.css` only after the shell has survived multiple releases;
-5. keep Navigation Confidence isolated until actual usage shows whether it deserves broader workspace navigation behavior.
+1. remove the inert legacy Text Mode focus declaration from `sidepanel-maintenance.css` after v2.4.1 visual verification;
+2. remove dead legacy header/status CSS after confirming Quiet Shell stability;
+3. promote row/action overlap + selection -> `sidepanel-editor.css`;
+4. consolidate remaining reusable line-number/footer utilities -> `sidepanel-components.css` without changing Save Confidence behavior;
+5. prune superseded tab rules from `sidepanel-maintenance.css` only after the shell has survived multiple releases;
+6. keep Navigation Confidence isolated until actual usage shows whether it deserves broader workspace navigation behavior.
