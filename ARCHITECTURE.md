@@ -1,7 +1,7 @@
 # MemoTool — Architecture Baseline
 
-Baseline: **v2.4.4**  
-Updated: **2026-08-25**
+Baseline: **v2.5.0**  
+Updated: **2026-08-26**
 
 ## Runtime composition
 
@@ -9,6 +9,7 @@ Updated: **2026-08-25**
 - `sidepanel.html`: explicit script/style composition; no wrapper/bootstrap layer. The persistent top surface is the tab-first Quiet Shell.
 - `sidepanel.js`: app state, load/save lifecycle, history, completed-archive adapter and initialization.
 - `outliner-structure.js`: DOM-free structural invariants for active/completed ordering, subtree boundaries and child detection.
+- `recovery-state.js`: DOM-free storage-load classification and active-tab recovery decisions.
 - `save-state.js`: DOM-free save snapshot identity (`tabs + activeTabId`) and stale-write detection.
 - `tab-navigation-core.js`: DOM-free tab-title normalization, filtering and result-index movement for Quick Switch.
 - `sidepanel-tabs.js`: tab lifecycle and tab UI mechanics. Switching active tabs is a persisted state change.
@@ -18,6 +19,7 @@ Updated: **2026-08-25**
 - `sidepanel-selection.js`: multi-selection state/commands.
 - `sidepanel-ui.js`: menus, fold action and storage-listener UI coordination; new-tab menu keyboard/open-close continuity remains here.
 - `sidepanel-model.js`: model normalization/factories.
+- `sidepanel-recovery.js`: failure-only storage recovery adaptation. It preflights persisted tabs before normal load, blocks default-tab creation / legacy migration when stored tabs are invalid, preserves the existing storage value, and exposes a retry path.
 - `sidepanel-runtime.js`: serialized 180ms-debounced persistence coordinator, visibility/pagehide flush and save-state transitions.
 - `sidepanel-focus.js`: session-only caret/focus/vertical-scroll continuity, shortcut restoration and thin wrappers around existing tab/new-tab transitions so focus logic is not duplicated by callers.
 - `sidepanel-accessibility.js`: accessibility-specific behavior.
@@ -25,6 +27,7 @@ Updated: **2026-08-25**
 - `sidepanel-shell.js`: thin shell adaptation layer. It may re-present instance warning and outliner-only utility visibility, but does not own storage, memo content, tab CRUD or outliner structure.
 - `sidepanel-navigation.js`: temporary Quick Switch DOM/event layer. It reads existing tabs and delegates changed-tab activation to `switchTab()`; it owns no persistence or duplicate focus-restoration path.
 - `sidepanel-navigation.css`: Quick Switch surface presentation only.
+- `sidepanel-recovery.css`: failure-only retry control presentation. Healthy state remains invisible.
 
 ## Data model
 
@@ -32,7 +35,9 @@ The canonical outliner representation remains `items[] + depth`, not nested obje
 
 Navigation Confidence adds **no persisted model**. It derives results from the current in-memory `tabs` array and keeps only temporary query/selection state while the switcher is open.
 
-Interaction Precision also adds **no local persisted model**. It extends the existing `memoCaretByTabId` session state with vertical `scrollTop` when available. That state is disposable across browser sessions and never becomes memo content.
+Interaction Precision adds **no local persisted model**. It extends the existing `memoCaretByTabId` session state with vertical `scrollTop` when available. That state is disposable across browser sessions and never becomes memo content.
+
+Intent & Reliability Coherence also adds **no new persisted schema**. Recovery state is runtime-only; invalid persisted `tabs` is treated as a blocked-load condition rather than as an empty memo collection.
 
 ## Navigation boundary
 
@@ -69,6 +74,18 @@ Save Confidence is intentionally split by responsibility:
 
 A completed write only clears dirty when the current `tabs + activeTabId` still match the snapshot that was written. This prevents an older in-flight write from erasing knowledge of newer input or navigation.
 
+## Recovery boundary
+
+Recovery Confidence follows **Detect → Contain → Explain → Recover → Test**.
+
+- `recovery-state.js` classifies stored tabs as `missing`, `ok`, or `invalid` without DOM or Chrome dependencies.
+- `sidepanel-recovery.js` preflights `chrome.storage.local.tabs` before the normal loader runs.
+- `missing` is a normal empty state and may proceed to default-tab creation.
+- `invalid` is **not** interpreted as empty. Runtime enters a write-blocked recovery state, clears only in-memory presentation state, skips default-tab creation and legacy migration, and leaves the persisted value untouched.
+- The footer exposes a retry control only while load/save recovery is actionable. Healthy state remains visually quiet.
+- A retry re-reads storage before unblocking. It does not overwrite the invalid stored value just to make the application boot.
+- No schema version, backup history, migration framework or second persistence store is introduced by v2.5.0.
+
 ## Shell boundary
 
 The Shell is intentionally smaller than the application:
@@ -81,10 +98,12 @@ The Shell is intentionally smaller than the application:
 ## Change rule
 
 - Pure structure rules: `outliner-structure.js` + Node tests.
+- Pure recovery decisions: `recovery-state.js` + Node tests.
 - Pure save snapshot rules: `save-state.js` + Node tests.
 - Pure tab navigation rules: `tab-navigation-core.js` + Node tests.
 - Persistent shell presentation: `sidepanel-shell.css/js` + static shell contract test.
 - Quick Switch presentation: `sidepanel-navigation.css/js` + navigation contract test.
+- Failure-only storage recovery: `sidepanel-recovery.js/css` + recovery contract test.
 - Cross-tab/new-tab focus and vertical-scroll continuity: `sidepanel-focus.js` + Interaction Precision contract test.
 - New-tab menu open/close/keyboard continuity: `sidepanel-ui.js` + Interaction Precision contract test.
 - DOM rendering: renderer/UI modules.
@@ -93,3 +112,4 @@ The Shell is intentionally smaller than the application:
 - Do not centralize browser-context behavior merely for DRYness.
 - Do not place feature logic in the Shell merely because its control is visible there.
 - Do not add persisted navigation history until a real repeated-navigation problem justifies it.
+- Do not add recovery storage layers until a concrete data-loss scenario requires them.
