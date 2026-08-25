@@ -1,5 +1,7 @@
 // --- レンダリング: エディタ ---
 
+const OUTLINER_MAX_VISUAL_INDENT = 100;
+
 function renderEditor() {
   const editor = document.getElementById('editor');
   const currentTab = tabs.find(t => t.id === activeTabId);
@@ -70,7 +72,8 @@ function renderEditor() {
     row.dataset.itemId = item.id;
     
     if (selectedItemIds.has(item.id)) row.classList.add('selected');
-    row.style.paddingLeft = (item.depth * 20) + 'px';
+    const visualIndent = Math.min(Math.max(0, item.depth) * 20, OUTLINER_MAX_VISUAL_INDENT);
+    row.style.paddingLeft = visualIndent + 'px';
     
     row.addEventListener('dragstart', (e) => {
       if (!isRowDragHandleDown) {
@@ -152,7 +155,7 @@ function renderEditor() {
 
     const line = document.createElement('div');
     line.className = 'guide-line';
-    line.style.left = (item.depth * 20) + 'px';
+    line.style.left = visualIndent + 'px';
     
     const hasChildren = window.MemoOutlinerStructure.hasActiveChildren(currentTab.items, index);
 

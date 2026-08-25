@@ -21,8 +21,42 @@
     if (btnLineNumbers) btnLineNumbers.hidden = !isOutliner;
   };
 
+  let activeTabVisibilityFrame = null;
+
+  function ensureActiveTabVisible() {
+    const list = document.getElementById('tab-list');
+    const activeTab = list?.querySelector('.tab.active');
+    if (!list || !activeTab) return;
+
+    const listRect = list.getBoundingClientRect();
+    const tabRect = activeTab.getBoundingClientRect();
+    const isOutside = tabRect.left < listRect.left || tabRect.right > listRect.right;
+    if (!isOutside) return;
+
+    activeTab.scrollIntoView({
+      behavior: 'auto',
+      block: 'nearest',
+      inline: 'nearest'
+    });
+  }
+
+  function scheduleActiveTabVisibilityCheck() {
+    if (activeTabVisibilityFrame !== null) cancelAnimationFrame(activeTabVisibilityFrame);
+    activeTabVisibilityFrame = requestAnimationFrame(() => {
+      activeTabVisibilityFrame = null;
+      ensureActiveTabVisible();
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     updateInstanceAlert();
     updateSortButtonVisibility();
+
+    const tabList = document.getElementById('tab-list');
+    if (tabList) {
+      const observer = new MutationObserver(scheduleActiveTabVisibilityCheck);
+      observer.observe(tabList, { childList: true });
+      scheduleActiveTabVisibilityCheck();
+    }
   }, { once: true });
 })();

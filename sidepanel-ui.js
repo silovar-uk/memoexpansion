@@ -1,5 +1,42 @@
 let copyAllFeedbackTimer = null;
 
+const POPUP_VIEWPORT_MARGIN = 6;
+
+function clampPopupMenuToViewport(menu) {
+  if (!menu?.classList?.contains('popup-menu')) return;
+
+  const rect = menu.getBoundingClientRect();
+  const maxRight = Math.max(POPUP_VIEWPORT_MARGIN, window.innerWidth - POPUP_VIEWPORT_MARGIN);
+  const maxBottom = Math.max(POPUP_VIEWPORT_MARGIN, window.innerHeight - POPUP_VIEWPORT_MARGIN);
+  let left = rect.left;
+  let top = rect.top;
+
+  if (rect.right > maxRight) left -= rect.right - maxRight;
+  if (rect.left < POPUP_VIEWPORT_MARGIN) left += POPUP_VIEWPORT_MARGIN - rect.left;
+  if (rect.bottom > maxBottom) top -= rect.bottom - maxBottom;
+  if (rect.top < POPUP_VIEWPORT_MARGIN) top += POPUP_VIEWPORT_MARGIN - rect.top;
+
+  menu.style.left = `${Math.max(POPUP_VIEWPORT_MARGIN, left)}px`;
+  menu.style.top = `${Math.max(POPUP_VIEWPORT_MARGIN, top)}px`;
+  menu.style.right = 'auto';
+  menu.style.bottom = 'auto';
+  menu.style.maxWidth = `calc(100vw - ${POPUP_VIEWPORT_MARGIN * 2}px)`;
+  menu.style.maxHeight = `calc(100vh - ${POPUP_VIEWPORT_MARGIN * 2}px)`;
+  menu.style.overflowY = 'auto';
+}
+
+function setupPopupBoundaryObserver() {
+  const observer = new MutationObserver((records) => {
+    records.forEach((record) => {
+      record.addedNodes.forEach((node) => {
+        if (!(node instanceof HTMLElement) || !node.classList.contains('popup-menu')) return;
+        requestAnimationFrame(() => clampPopupMenuToViewport(node));
+      });
+    });
+  });
+  observer.observe(document.body, { childList: true });
+}
+
 function setupEventListeners() {
   const menuBtn = document.getElementById('new-tab-btn');
   const menu = document.getElementById('new-tab-menu');
@@ -7,6 +44,8 @@ function setupEventListeners() {
     document.getElementById('menu-outliner'),
     document.getElementById('menu-text')
   ].filter(Boolean);
+
+  setupPopupBoundaryObserver();
 
   const isNewTabMenuOpen = () => menu?.style.display === 'flex';
   const closeNewTabMenu = ({ returnFocus = false } = {}) => {
