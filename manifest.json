@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.4.3",
-  "description": "見た目を変えず、Editor・Footer・ShellのCSS責務を正式ownerへ整理したUI Architecture Cleanup版MemoTool。",
+  "version": "2.4.4",
+  "description": "タブ切替・新規メモ・メニュー操作のfocusとscrollを自然につなげたInteraction Precision版MemoTool。",
   "permissions": [
     "sidePanel",
     "storage",
