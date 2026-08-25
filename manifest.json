@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.4.0",
-  "description": "タブが増えてもAlt+Qまたは検索ボタンから名前で素早く切り替えられるNavigation Confidence版MemoTool。",
+  "version": "2.4.1",
+  "description": "テキストメモの横スクロールと強いフォーカス枠を抑え、文章そのものに集中できるQuiet Text Canvas版MemoTool。",
   "permissions": [
     "sidePanel",
     "storage",
