@@ -1,3 +1,16 @@
+# MemoTool v2.4.1 — Quiet Text Canvas
+
+## 2026/08/25
+
+- テキストモードをフォーム風textareaではなく、文章そのものを直接編集するText Canvasとして再調整
+- `box-sizing: border-box` と `pre-wrap` + `overflow-wrap:anywhere` を明示し、通常文章・長いURL・連続英数字がSide Panel幅内で自然に折り返すよう変更
+- Text Modeではtextarea自身を単一の縦スクロール面にし、外側editorとの二重スクロールを回避
+- 横スクロールは通常のText Mode操作から外し、縦スクロールバーだけを細く・透明track・低彩度thumbで維持
+- クリック／focus時に出ていた濃い2px枠を、非常に薄いneutral focus cueへ変更
+- selection・caret・placeholderもQuiet UIの色階層へ統一
+- `.text-editor-area` にscopeし、Outlinerの `.item-input` / `.item-note` のfocus・overflow挙動には変更を加えない
+- `tests/text-canvas-contract.test.js` を追加し、wrap・overflow・scrollbar・focusの契約をGitHub Actionsで固定
+
 # MemoTool v2.4.0 — Navigation Confidence
 
 ## 2026/08/25
