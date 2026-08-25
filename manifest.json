@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.4.5",
-  "description": "狭幅・大量タブ・深い階層・画面端でも操作と現在位置を保つLayout Resilience版MemoTool。",
+  "version": "2.5.0",
+  "description": "保存データ異常時の上書きを防ぎ、失敗時だけ回復導線を出すIntent & Reliability Coherence版MemoTool。",
   "permissions": [
     "sidePanel",
     "storage",
