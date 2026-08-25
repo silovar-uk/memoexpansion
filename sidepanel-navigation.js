@@ -93,8 +93,11 @@
     const tab = results[index];
     if (!tab) return;
     closeSwitcher({ restoreFocus: false });
-    if (tab.id !== activeTabId) switchTab(tab.id);
-    requestAnimationFrame(() => window.MemoFocus?.focusCurrentMemo());
+    if (tab.id !== activeTabId) {
+      switchTab(tab.id);
+    } else {
+      requestAnimationFrame(() => window.MemoFocus?.focusCurrentMemo());
+    }
   }
 
   button.addEventListener('click', () => isOpen() ? closeSwitcher() : openSwitcher());
