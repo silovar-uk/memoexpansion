@@ -12,6 +12,7 @@ const checks = [
   ['focus state stores scrollTop', /state\.scrollTop\s*=\s*scrollOwner\.scrollTop/.test(focus)],
   ['text mode scroll owner is textarea', /tab\.mode === 'text'[\s\S]*text-editor-area/.test(focus)],
   ['outliner scroll owner is editor', /document\.getElementById\('editor'\)/.test(focus)],
+  ['focusout captures outgoing memo context', /addEventListener\('focusout'[\s\S]*rememberFocusStateFromElement\(event\.target\)/.test(focus)],
   ['saved scroll is restored', /scrollOwner\.scrollTop = Math\.max\(0, savedState\.scrollTop\)/.test(focus)],
   ['tab switching is wrapped by MemoFocus', /originalSwitchTab[\s\S]*writeCurrentFocusNow\(\)[\s\S]*scheduleMemoFocus\(\)/.test(focus)],
   ['new tab creation is wrapped by MemoFocus', /originalCreateNewTab[\s\S]*writeCurrentFocusNow\(\)[\s\S]*scheduleMemoFocus\(\)/.test(focus)],
