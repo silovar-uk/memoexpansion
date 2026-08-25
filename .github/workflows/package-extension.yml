@@ -52,6 +52,7 @@ jobs:
           node --check tests/layout-resilience-contract.test.js
           node --check tests/recovery-state.test.js
           node --check tests/recovery-contract.test.js
+          node --check tests/recovery-flow.test.js
           node --check tests/version-coherence.test.js
           node --check tests/outliner-structure.test.js
 
@@ -90,6 +91,7 @@ jobs:
         run: |
           node tests/recovery-state.test.js
           node tests/recovery-contract.test.js
+          node tests/recovery-flow.test.js
 
       - name: Run version coherence test
         run: node tests/version-coherence.test.js
