@@ -1,3 +1,15 @@
+# MemoTool v2.4.4 — Interaction Precision
+
+## 2026/08/25
+
+- タブ切替前に現在メモのcaretと縦scroll位置をsession-onlyで退避し、切替後に復帰するInteraction Continuityを追加
+- Text Modeはtextarea、Outlinerは`#editor`をscroll ownerとして扱い、新しいlocal storage keyは追加しない
+- 新規メモ作成後はそのまま本文へfocusし、次の操作を即入力につなげる
+- Quick Switchの変更タブfocus処理を共通`MemoFocus`経路へ集約し、already-active時だけ直接focus
+- 新規メモ種別メニューにmenu/menuitem semantics、↑↓・Enter/Space・Esc focus returnを追加
+- 外側クリックでメニューを閉じる場合は、クリック先の文脈を優先してtriggerへfocusを戻さない
+- `tests/interaction-precision-contract.test.js` を追加し、session-only / scroll / focus / menu continuityをGitHub Actionsで固定
+
 # MemoTool v2.4.3 — UI Architecture Cleanup
 
 ## 2026/08/25
