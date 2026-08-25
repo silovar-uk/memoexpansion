@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.4.2",
-  "description": "余白を最適化し、本文は白のままShellとFooterを薄い青灰色で精密に整えたCool Precision版MemoTool。",
+  "version": "2.4.3",
+  "description": "見た目を変えず、Editor・Footer・ShellのCSS責務を正式ownerへ整理したUI Architecture Cleanup版MemoTool。",
   "permissions": [
     "sidePanel",
     "storage",
