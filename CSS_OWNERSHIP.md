@@ -1,13 +1,13 @@
 # MemoTool — CSS Ownership Map
 
-Baseline: **v2.4.3**  
-Updated: **2026-08-25**
+Baseline: **v2.5.0**  
+Updated: **2026-08-26**
 
 The UI is split by responsibility. A selector should have one long-term owner. `sidepanel-maintenance.css` remains a refinement/migration layer, not a permanent dumping ground.
 
 ## `sidepanel-navigation.css`
 
-Owns the temporary Navigation Confidence surface introduced in v2.4.0:
+Owns the temporary Navigation Confidence surface:
 - Quick Switch panel geometry;
 - search field presentation;
 - result row states;
@@ -18,7 +18,7 @@ It does **not** own the persistent tab bar. The search trigger button remains a 
 
 ## `sidepanel-shell.css`
 
-Owns the persistent top chrome introduced in v2.2.0:
+Owns the persistent top chrome:
 - tab-first shell layout;
 - top-shell spacing and density;
 - final persistent tab presentation;
@@ -72,10 +72,6 @@ Quiet Text Canvas contract:
 - selection, caret and placeholder colors remain subordinate to body text;
 - rules remain scoped to `.text-editor-area` so Outliner input behavior is unchanged.
 
-v2.4.3 ownership change:
-- `#editor-container`, final `#editor` padding, responsive editor padding and Text Mode focus no longer depend on `sidepanel-maintenance.css` overrides;
-- the old maintenance-layer dark Text Mode focus declaration was removed rather than overridden with higher specificity.
-
 The v2.1.6 row/action overlap fix and neutral Outliner selection language remain accepted behavior in `sidepanel-maintenance.css` for now and should be promoted separately after visual regression coverage exists.
 
 ## `sidepanel-components.css`
@@ -94,9 +90,16 @@ Save Confidence contract:
 - error styling remains persistent until a later save attempt changes state;
 - Shell or Navigation CSS must not redefine save-state semantics.
 
-v2.4.3 ownership change:
-- the final Cool Precision footer background, border, compact geometry and hover treatment now live here;
-- `sidepanel-maintenance.css` no longer restyles Footer presentation.
+## `sidepanel-recovery.css`
+
+Owns only the **failure-only recovery action** introduced in v2.5.0:
+- retry button geometry;
+- failure color treatment;
+- disabled/retry-in-flight state;
+- narrow-width compaction;
+- healthy-state hiding through `[hidden]`.
+
+It does **not** own normal save-status presentation, footer layout, storage semantics, or generic button styles. The control exists only when the system can offer an actionable load/save retry; healthy UI must remain unchanged.
 
 ## `sidepanel-maintenance.css`
 
@@ -114,7 +117,8 @@ It no longer owns or overrides:
 - editor viewport / editor padding;
 - Text Mode focus;
 - Footer presentation;
-- persistent tab/Shell presentation.
+- persistent tab/Shell presentation;
+- recovery retry presentation.
 
 Rules:
 1. Do not add a new broad visual theme here by default.
@@ -123,18 +127,19 @@ Rules:
 4. After migration, delete duplicate maintenance rules rather than accumulating override pairs.
 5. Visual behavior must remain unchanged during ownership-only migration.
 
-## UI architecture contract after v2.4.3
+## UI architecture contract after v2.5.0
 
 - Text Mode vertical scroll owner: `.text-editor-area`.
 - Outliner vertical scroll owner: `#editor`.
 - Tab strip horizontal navigation owner: tab strip mechanics in `sidepanel-tabs.css`, final persistent presentation in `sidepanel-shell.css`.
 - Quick Switch result scroll owner: `sidepanel-navigation.css` surface.
 - Footer final presentation owner: `sidepanel-components.css`.
+- Failure-only recovery action owner: `sidepanel-recovery.css`.
 - Text Mode focus owner: `sidepanel-editor.css`.
 
-`tests/ui-architecture-contract.test.js` prevents these responsibilities from drifting back into the maintenance layer.
+`tests/ui-architecture-contract.test.js` prevents established responsibilities from drifting back into the maintenance layer. `tests/recovery-contract.test.js` additionally protects the failure-only recovery surface.
 
-## Recommended next cleanup after v2.4.3
+## Recommended next cleanup after v2.5.0
 
 1. move stable Cool Precision/design tokens from `sidepanel-maintenance.css` to the base/design-token owner without changing values;
 2. promote row/action overlap + neutral selection from maintenance -> `sidepanel-editor.css` in one dedicated release;
