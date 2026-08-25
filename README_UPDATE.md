@@ -1,3 +1,23 @@
+# MemoTool v2.4.3 — UI Architecture Cleanup
+
+## 2026/08/25
+
+- 見た目・保存・Outliner・Navigationの挙動は変えず、CSSの最終ownerを整理
+- Editor viewport / line-number padding / Text Mode focusを `sidepanel-editor.css` へ集約
+- FooterのCool Precision presentationを `sidepanel-components.css` へ集約
+- persistent tab presentationは `sidepanel-shell.css` に一本化し、components / maintenanceの重複ruleを削除
+- `sidepanel-maintenance.css` から `#editor` / footer / Text focus / generic tab chromeの上書きを除去
+- `tests/ui-architecture-contract.test.js` を追加し、ownershipの逆戻りをGitHub Actionsで防止
+
+# MemoTool v2.4.2 — Cool Precision
+
+## 2026/08/25
+
+- legacyな大きいEditor下余白を18pxのbreathing roomへ縮小し、利用可能な高さを編集面へ返却
+- ShellとFooterを薄いCool Neutralで統一し、Text Canvas本文面は白のまま維持
+- active tabを低彩度blue-gray indicatorへ変更し、装飾量ではなく線と面差で精密感を付与
+- `tests/cool-precision-contract.test.js` を追加し、高さ・色温度・Text Canvas非回帰を固定
+
 # MemoTool v2.4.1 — Quiet Text Canvas
 
 ## 2026/08/25
