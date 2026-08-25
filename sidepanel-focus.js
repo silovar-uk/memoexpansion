@@ -36,14 +36,33 @@
     };
   }
 
+  function scrollOwnerForTab(tab) {
+    if (!tab) return null;
+    return tab.mode === 'text'
+      ? document.querySelector('.text-editor-area')
+      : document.getElementById('editor');
+  }
+
   async function writeCurrentFocusNow() {
     if (saveTimer !== null) {
       clearTimeout(saveTimer);
       saveTimer = null;
     }
 
-    const state = snapshotFromElement(document.activeElement);
-    if (!state || !activeTabId) return;
+    if (!activeTabId) return;
+    const currentTab = tabs.find((tab) => tab.id === activeTabId);
+    if (!currentTab) return;
+
+    let state = snapshotFromElement(document.activeElement);
+    if (!state && focusByTabId[activeTabId]) {
+      state = { ...focusByTabId[activeTabId], savedAt: Date.now() };
+    }
+    if (!state) return;
+
+    const scrollOwner = scrollOwnerForTab(currentTab);
+    if (scrollOwner && Number.isFinite(scrollOwner.scrollTop)) {
+      state.scrollTop = scrollOwner.scrollTop;
+    }
 
     focusByTabId[activeTabId] = state;
     try {
@@ -124,11 +143,50 @@
       target.setSelectionRange(end, end);
     }
 
-    target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    const scrollOwner = scrollOwnerForTab(currentTab);
+    if (scrollOwner && Number.isFinite(savedState?.scrollTop)) {
+      scrollOwner.scrollTop = Math.max(0, savedState.scrollTop);
+    } else {
+      target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+
     if (target.classList.contains('item-input') && typeof setOutlinerInputEditingState === 'function') {
       setOutlinerInputEditingState(target);
     }
     return true;
+  }
+
+  function scheduleMemoFocus() {
+    requestAnimationFrame(() => {
+      focusCurrentMemo().catch(() => {});
+    });
+  }
+
+  function installContinuityWrappers() {
+    const originalSwitchTab = window.switchTab;
+    if (typeof originalSwitchTab === 'function' && !originalSwitchTab.__memoContinuityWrapped) {
+      const wrappedSwitchTab = function wrappedSwitchTab(tabId) {
+        if (tabId === activeTabId) return originalSwitchTab.apply(this, arguments);
+        writeCurrentFocusNow().catch(() => {});
+        const result = originalSwitchTab.apply(this, arguments);
+        scheduleMemoFocus();
+        return result;
+      };
+      wrappedSwitchTab.__memoContinuityWrapped = true;
+      window.switchTab = wrappedSwitchTab;
+    }
+
+    const originalCreateNewTab = window.createNewTab;
+    if (typeof originalCreateNewTab === 'function' && !originalCreateNewTab.__memoContinuityWrapped) {
+      const wrappedCreateNewTab = function wrappedCreateNewTab(mode) {
+        writeCurrentFocusNow().catch(() => {});
+        const result = originalCreateNewTab.apply(this, arguments);
+        scheduleMemoFocus();
+        return result;
+      };
+      wrappedCreateNewTab.__memoContinuityWrapped = true;
+      window.createNewTab = wrappedCreateNewTab;
+    }
   }
 
   focusStateReady = chrome.storage.session.get(STORAGE_KEY)
@@ -154,4 +212,6 @@
     focusCurrentMemo,
     saveCurrentFocus: writeCurrentFocusNow
   };
+
+  installContinuityWrappers();
 })();
