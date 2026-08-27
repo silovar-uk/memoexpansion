@@ -57,7 +57,7 @@
     popup.className = 'popup-menu item-metadata-popup';
     popup.dataset.itemId = itemId;
     popup.setAttribute('role', 'dialog');
-    popup.setAttribute('aria-label', 'リンク詳細');
+    popup.setAttribute('aria-label', '詳細');
     document.body.appendChild(popup);
     activeMetadataPopup = popup;
     positionMetadataPopup(popup, anchor);
@@ -71,27 +71,16 @@
     return header;
   }
 
-  function openMetadataViewer(itemId, anchor) {
-    const found = findActiveItem(itemId);
-    if (!found) return;
-    const note = found.item.note || '';
-    const urls = extractUrls(note);
-    if (urls.length === 0) {
-      openMetadataEditor(itemId, anchor);
-      return;
-    }
-    const plainText = extractNonUrlText(note);
+  function appendPlainText(popup, plainText) {
+    if (!plainText) return;
+    const textBlock = document.createElement('div');
+    textBlock.className = 'item-metadata-plain-text';
+    textBlock.textContent = plainText;
+    popup.appendChild(textBlock);
+  }
 
-    const popup = createPopupShell(itemId, anchor);
-    popup.appendChild(makePopupHeader(plainText ? '詳細 / リンク' : (urls.length === 1 ? 'リンク' : `リンク ${urls.length}件`)));
-
-    if (plainText) {
-      const textBlock = document.createElement('div');
-      textBlock.className = 'item-metadata-plain-text';
-      textBlock.textContent = plainText;
-      popup.appendChild(textBlock);
-    }
-
+  function appendLinks(popup, urls) {
+    if (urls.length === 0) return;
     const list = document.createElement('div');
     list.className = 'item-metadata-link-list';
     urls.forEach((url) => {
@@ -109,6 +98,27 @@
       list.appendChild(link);
     });
     popup.appendChild(list);
+  }
+
+  function openMetadataViewer(itemId, anchor) {
+    const found = findActiveItem(itemId);
+    if (!found) return;
+    const note = found.item.note || '';
+    if (!note.trim()) {
+      openMetadataEditor(itemId, anchor);
+      return;
+    }
+
+    const urls = extractUrls(note);
+    const plainText = extractNonUrlText(note);
+    const popup = createPopupShell(itemId, anchor);
+    const headerText = urls.length === 0
+      ? '詳細'
+      : (plainText ? '詳細 / リンク' : (urls.length === 1 ? 'リンク' : `リンク ${urls.length}件`));
+    popup.appendChild(makePopupHeader(headerText));
+
+    appendPlainText(popup, plainText);
+    appendLinks(popup, urls);
 
     const editButton = document.createElement('button');
     editButton.type = 'button';
@@ -211,23 +221,36 @@
     });
   }
 
-  function createLinkTrigger(item) {
-    const urls = extractUrls(item.note || '');
-    if (urls.length === 0) return null;
+  function detailIconSvg() {
+    return '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M7 7h10M7 12h10M7 17h6"/></svg>';
+  }
+
+  function createMetadataTrigger(item) {
+    const note = item.note || '';
+    if (!note.trim()) return null;
+    const urls = extractUrls(note);
+    const hasLinks = urls.length > 0;
 
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'item-metadata-trigger';
+    button.className = `item-metadata-trigger ${hasLinks ? 'is-link' : 'is-plain'}`;
     button.dataset.itemId = item.id;
-    button.setAttribute('aria-label', urls.length === 1 ? 'リンクを開く' : `リンク ${urls.length}件を開く`);
-    button.title = urls.length === 1 ? compactUrlLabel(urls[0]) : `リンク ${urls.length}件`;
-    button.innerHTML = iconSvg('link', 13);
+    button.setAttribute('aria-label', hasLinks
+      ? (urls.length === 1 ? 'リンクを開く' : `リンク ${urls.length}件を開く`)
+      : '詳細を開く');
+    button.title = hasLinks
+      ? (urls.length === 1 ? compactUrlLabel(urls[0]) : `リンク ${urls.length}件`)
+      : '詳細あり';
+    button.innerHTML = hasLinks ? iconSvg('link', 13) : detailIconSvg();
+
     if (urls.length > 1) {
       const count = document.createElement('span');
       count.className = 'item-metadata-count';
       count.textContent = String(urls.length);
+      count.setAttribute('aria-hidden', 'true');
       button.appendChild(count);
     }
+
     button.addEventListener('pointerdown', event => event.stopPropagation());
     button.addEventListener('click', (event) => {
       event.preventDefault();
@@ -251,20 +274,28 @@
     document.querySelectorAll('.row[data-item-id]').forEach((row) => {
       const item = itemById.get(row.dataset.itemId);
       if (!item) return;
-      const urls = extractUrls(item.note || '');
+      const note = item.note || '';
+      const hasMetadata = note.trim().length > 0;
+      const urls = extractUrls(note);
       const hasLinks = urls.length > 0;
       const noteDisplay = row.querySelector('.item-note-display');
       const linkContainer = row.querySelector('.note-link-container');
       const actions = row.querySelector('.row-actions');
-      row.classList.toggle('has-compact-metadata', hasLinks);
 
-      if (hasLinks) {
-        noteDisplay?.classList.add('hidden');
-        if (linkContainer) linkContainer.style.display = 'none';
-        if (actions && !actions.querySelector('.item-metadata-trigger')) {
-          const trigger = createLinkTrigger(item);
-          if (trigger) actions.insertBefore(trigger, actions.lastElementChild || null);
-        }
+      row.classList.toggle('has-compact-metadata', hasMetadata);
+      row.classList.toggle('has-link-metadata', hasMetadata && hasLinks);
+      row.classList.toggle('has-plain-metadata', hasMetadata && !hasLinks);
+
+      if (!hasMetadata) {
+        actions?.querySelector('.item-metadata-trigger')?.remove();
+        return;
+      }
+
+      noteDisplay?.classList.add('hidden');
+      if (linkContainer) linkContainer.style.display = 'none';
+      if (actions && !actions.querySelector('.item-metadata-trigger')) {
+        const trigger = createMetadataTrigger(item);
+        if (trigger) actions.insertBefore(trigger, actions.lastElementChild || null);
       }
     });
   }
