@@ -14,11 +14,15 @@
   font: inherit;
   cursor: pointer;
 }
-.item-metadata-trigger:hover,
-.item-metadata-trigger:focus-visible {
+.item-metadata-trigger:hover {
   color: var(--accent-color);
   background: var(--accent-soft);
-  outline: none;
+}
+.item-metadata-trigger:focus-visible {
+  color: var(--accent-color);
+  background: var(--focus-soft);
+  outline: 2px solid var(--focus-color);
+  outline-offset: 1px;
 }
 .item-metadata-trigger svg,
 .item-metadata-link svg {
@@ -38,14 +42,14 @@
 .item-metadata-popup {
   width: min(300px, calc(100vw - 12px));
   min-width: 220px;
-  gap: 5px;
-  padding: 7px;
+  gap: 4px;
+  padding: 6px;
 }
 .item-metadata-popup.is-editing {
   width: min(330px, calc(100vw - 12px));
 }
 .item-metadata-header {
-  padding: 1px 3px 4px;
+  padding: 1px 2px 3px;
   color: var(--text-faint);
   font-size: 10px;
   line-height: 1.2;
@@ -57,7 +61,7 @@
 }
 .item-metadata-link {
   min-width: 0;
-  padding: 5px 6px;
+  padding: 4px 6px;
   border-radius: 3px;
   color: var(--text-color);
   text-decoration: none;
@@ -72,11 +76,15 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.item-metadata-link:hover,
-.item-metadata-link:focus-visible {
+.item-metadata-link:hover {
   background: var(--surface-hover);
   color: var(--accent-color);
-  outline: none;
+}
+.item-metadata-link:focus-visible {
+  background: var(--focus-soft);
+  color: var(--accent-color);
+  outline: 2px solid var(--focus-color);
+  outline-offset: -1px;
 }
 .item-metadata-edit-btn {
   align-self: flex-end;
@@ -89,11 +97,15 @@
   font-size: 11px;
   cursor: pointer;
 }
-.item-metadata-edit-btn:hover,
-.item-metadata-edit-btn:focus-visible {
+.item-metadata-edit-btn:hover {
   background: var(--surface-hover);
   color: var(--text-color);
-  outline: none;
+}
+.item-metadata-edit-btn:focus-visible {
+  background: var(--focus-soft);
+  color: var(--text-color);
+  outline: 2px solid var(--focus-color);
+  outline-offset: 1px;
 }
 .item-metadata-editor {
   width: 100%;
@@ -113,8 +125,8 @@
   overflow-wrap: anywhere;
 }
 .item-metadata-editor:focus {
-  border-color: var(--border-strong);
-  box-shadow: 0 0 0 1px rgba(85,85,79,.06);
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 2px var(--focus-soft);
 }
 .item-metadata-hint {
   padding: 0 2px;
