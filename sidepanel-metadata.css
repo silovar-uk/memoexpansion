@@ -1,0 +1,124 @@
+/* Compact metadata: URL-only notes stay out of the vertical text flow. */
+.item-metadata-trigger {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 3px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-faint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font: inherit;
+  cursor: pointer;
+}
+.item-metadata-trigger:hover,
+.item-metadata-trigger:focus-visible {
+  color: var(--accent-color);
+  background: var(--accent-soft);
+  outline: none;
+}
+.item-metadata-trigger svg,
+.item-metadata-link svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+.item-metadata-count {
+  min-width: 7px;
+  font-size: 9px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.item-metadata-popup {
+  width: min(300px, calc(100vw - 12px));
+  min-width: 220px;
+  gap: 5px;
+  padding: 7px;
+}
+.item-metadata-popup.is-editing {
+  width: min(330px, calc(100vw - 12px));
+}
+.item-metadata-header {
+  padding: 1px 3px 4px;
+  color: var(--text-faint);
+  font-size: 10px;
+  line-height: 1.2;
+}
+.item-metadata-link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.item-metadata-link {
+  min-width: 0;
+  padding: 5px 6px;
+  border-radius: 3px;
+  color: var(--text-color);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+.item-metadata-link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.item-metadata-link:hover,
+.item-metadata-link:focus-visible {
+  background: var(--surface-hover);
+  color: var(--accent-color);
+  outline: none;
+}
+.item-metadata-edit-btn {
+  align-self: flex-end;
+  height: 24px;
+  padding: 0 7px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+.item-metadata-edit-btn:hover,
+.item-metadata-edit-btn:focus-visible {
+  background: var(--surface-hover);
+  color: var(--text-color);
+  outline: none;
+}
+.item-metadata-editor {
+  width: 100%;
+  min-height: 72px;
+  max-height: 190px;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 7px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  outline: none;
+  background: var(--surface);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.item-metadata-editor:focus {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 1px rgba(85,85,79,.06);
+}
+.item-metadata-hint {
+  padding: 0 2px;
+  color: var(--text-faint);
+  font-size: 9.5px;
+  text-align: right;
+}
