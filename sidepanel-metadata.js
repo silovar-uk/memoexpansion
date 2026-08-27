@@ -2,7 +2,7 @@
   if (typeof document === 'undefined') return;
   if (!window.MemoNoteMetadata) return;
 
-  const { extractUrls, classifyNote, compactUrlLabel } = window.MemoNoteMetadata;
+  const { extractUrls, extractNonUrlText, compactUrlLabel } = window.MemoNoteMetadata;
   const originalRenderEditor = window.renderEditor;
   const originalHandleKey = window.handleKey;
   let activeMetadataPopup = null;
@@ -74,14 +74,23 @@
   function openMetadataViewer(itemId, anchor) {
     const found = findActiveItem(itemId);
     if (!found) return;
-    const urls = extractUrls(found.item.note || '');
+    const note = found.item.note || '';
+    const urls = extractUrls(note);
     if (urls.length === 0) {
       openMetadataEditor(itemId, anchor);
       return;
     }
+    const plainText = extractNonUrlText(note);
 
     const popup = createPopupShell(itemId, anchor);
-    popup.appendChild(makePopupHeader(urls.length === 1 ? 'リンク' : `リンク ${urls.length}件`));
+    popup.appendChild(makePopupHeader(plainText ? '詳細 / リンク' : (urls.length === 1 ? 'リンク' : `リンク ${urls.length}件`)));
+
+    if (plainText) {
+      const textBlock = document.createElement('div');
+      textBlock.className = 'item-metadata-plain-text';
+      textBlock.textContent = plainText;
+      popup.appendChild(textBlock);
+    }
 
     const list = document.createElement('div');
     list.className = 'item-metadata-link-list';
@@ -134,7 +143,7 @@
     const textarea = document.createElement('textarea');
     textarea.className = 'item-metadata-editor';
     textarea.value = item.note || '';
-    textarea.placeholder = 'URLを改行して入力...';
+    textarea.placeholder = '詳細やURLを入力...';
     textarea.spellcheck = false;
     textarea.rows = Math.min(7, Math.max(3, textarea.value.split(/\r?\n/).length));
     popup.appendChild(textarea);
@@ -242,13 +251,14 @@
     document.querySelectorAll('.row[data-item-id]').forEach((row) => {
       const item = itemById.get(row.dataset.itemId);
       if (!item) return;
-      const kind = classifyNote(item.note || '');
+      const urls = extractUrls(item.note || '');
+      const hasLinks = urls.length > 0;
       const noteDisplay = row.querySelector('.item-note-display');
       const linkContainer = row.querySelector('.note-link-container');
       const actions = row.querySelector('.row-actions');
-      row.classList.toggle('has-compact-metadata', kind === 'url-only');
+      row.classList.toggle('has-compact-metadata', hasLinks);
 
-      if (kind === 'url-only') {
+      if (hasLinks) {
         noteDisplay?.classList.add('hidden');
         if (linkContainer) linkContainer.style.display = 'none';
         if (actions && !actions.querySelector('.item-metadata-trigger')) {
