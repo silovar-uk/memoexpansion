@@ -6,6 +6,11 @@ assert.deepStrictEqual(
   metadata.extractUrls('https://example.com\nhttps://github.com/test/repo'),
   ['https://example.com', 'https://github.com/test/repo']
 );
+assert.deepStrictEqual(metadata.extractUrls('C:\\Users\\M23WX0\\memo.docx'), []);
+assert.deepStrictEqual(metadata.extractUrls('\\\\server\\folder\\memo.pdf'), []);
+assert.deepStrictEqual(metadata.extractUrls('www.example.com'), []);
+assert.deepStrictEqual(metadata.extractUrls('user@example.com'), []);
+assert.deepStrictEqual(metadata.extractUrls('file:///C:/Users/example/memo.txt'), []);
 
 assert.strictEqual(metadata.extractNonUrlText('https://example.com'), '');
 assert.strictEqual(metadata.extractNonUrlText('参考\nhttps://example.com'), '参考');
