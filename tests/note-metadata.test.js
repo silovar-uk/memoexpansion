@@ -7,6 +7,13 @@ assert.deepStrictEqual(
   ['https://example.com', 'https://github.com/test/repo']
 );
 
+assert.strictEqual(metadata.extractNonUrlText('https://example.com'), '');
+assert.strictEqual(metadata.extractNonUrlText('参考\nhttps://example.com'), '参考');
+assert.strictEqual(
+  metadata.extractNonUrlText('参考\nhttps://example.com\n補足メモ'),
+  '参考\n\n補足メモ'
+);
+
 assert.strictEqual(metadata.classifyNote(''), 'empty');
 assert.strictEqual(metadata.classifyNote('   \n  '), 'empty');
 assert.strictEqual(metadata.classifyNote('https://example.com'), 'url-only');

@@ -12,12 +12,20 @@
     return matches || [];
   }
 
+  function extractNonUrlText(note) {
+    return normalizeNote(note)
+      .replace(/https?:\/\/[^\s]+/g, '')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
   function isUrlOnlyNote(note) {
     const text = normalizeNote(note).trim();
     if (!text) return false;
     const urls = extractUrls(text);
     if (urls.length === 0) return false;
-    return text.replace(/https?:\/\/[^\s]+/g, '').trim() === '';
+    return extractNonUrlText(text) === '';
   }
 
   function classifyNote(note) {
@@ -41,6 +49,7 @@
 
   return {
     extractUrls,
+    extractNonUrlText,
     isUrlOnlyNote,
     classifyNote,
     compactUrlLabel

@@ -1,4 +1,4 @@
-/* Compact metadata: URL-only notes stay out of the vertical text flow. */
+/* Compact metadata: notes containing links stay out of the vertical text flow. */
 .item-metadata-trigger {
   min-width: 20px;
   height: 20px;
@@ -46,7 +46,7 @@
   content: "1";
 }
 
-/* URL-only rows expose link presence at rest without promoting every row action. */
+/* Link-bearing rows expose link presence at rest without promoting every row action. */
 .row.has-compact-metadata .input-wrapper {
   padding-right: 62px;
 }
@@ -95,6 +95,17 @@
   color: var(--text-faint);
   font-size: 10px;
   line-height: 1.2;
+}
+.item-metadata-plain-text {
+  padding: 5px 6px;
+  border-radius: 3px;
+  background: var(--surface-subtle);
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
 }
 .item-metadata-link-list {
   display: flex;
