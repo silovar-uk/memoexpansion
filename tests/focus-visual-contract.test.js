@@ -25,6 +25,10 @@ const checks = [
   ['metadata edit control has visible keyboard focus', metadata.includes('.item-metadata-edit-btn:focus-visible')],
   ['metadata editor uses shared focus color', metadata.includes('.item-metadata-editor:focus') && metadata.includes('border-color: var(--focus-color);')],
   ['metadata focus does not suppress outlines', !metadata.includes('focus-visible {\n  background: var(--surface-hover);\n  color: var(--text-color);\n  outline: none;')],
+  ['single URL gets an explicit count cue', metadata.includes('.item-metadata-trigger:not(:has(.item-metadata-count))::after') && metadata.includes('content: "1";')],
+  ['URL-only row reserves room for link presence', metadata.includes('.row.has-compact-metadata .input-wrapper') && metadata.includes('padding-right: 62px;')],
+  ['URL-only row actions remain visible at rest', /\.row\.has-compact-metadata \.row-actions\s*\{[\s\S]*?opacity:\s*1;[\s\S]*?\}/.test(metadata)],
+  ['completion action stays quiet beside persistent link presence', /\.row\.has-compact-metadata \.action-icon\.check\s*\{[\s\S]*?opacity:\s*\.24;[\s\S]*?\}/.test(metadata)],
 ];
 
 for (const [name, ok] of checks) {
