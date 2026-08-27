@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const root = path.resolve(__dirname, '..');
 const maintenance = fs.readFileSync(path.join(root, 'sidepanel-maintenance.css'), 'utf8');
+const shell = fs.readFileSync(path.join(root, 'sidepanel-shell.css'), 'utf8');
 const navigation = fs.readFileSync(path.join(root, 'sidepanel-navigation.css'), 'utf8');
 const metadata = fs.readFileSync(path.join(root, 'sidepanel-metadata.css'), 'utf8');
 const inputFocusBlock = (maintenance.match(/\.item-input:focus-visible,[\s\S]*?\.item-note:focus-visible\s*\{([\s\S]*?)\}/) || [])[1] || '';
@@ -15,6 +16,8 @@ const checks = [
   ['keyboard controls keep visible focus outline', maintenance.includes('outline: 2px solid var(--focus-color);')],
   ['selection remains semantically distinct', maintenance.includes('--selection-mark: #44443f;') && !maintenance.includes('--selection-mark: #66869a;')],
   ['old heavy outliner focus line is gone', !inputFocusBlock.includes('inset 0 -2px 0 var(--focus-color)')],
+  ['persistent shell utilities stay quiet when idle', shell.includes('background: transparent; color: var(--text-faint);')],
+  ['persistent shell utilities strengthen on keyboard focus', shell.includes('background: var(--focus-soft); color: var(--text-color); border-color: transparent;')],
   ['Quick Switch search uses shared focus color', navigation.includes('border-color: var(--focus-color);') && navigation.includes('box-shadow: 0 0 0 2px var(--focus-soft);')],
   ['Quick Switch selected candidate has a location cue', navigation.includes('box-shadow: inset 2px 0 0 var(--focus-color);')],
   ['metadata trigger has visible keyboard focus', metadata.includes('.item-metadata-trigger:focus-visible') && metadata.includes('outline: 2px solid var(--focus-color);')],
