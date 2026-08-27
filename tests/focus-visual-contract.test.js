@@ -21,14 +21,16 @@ const checks = [
   ['Quick Switch search uses shared focus color', navigation.includes('border-color: var(--focus-color);') && navigation.includes('box-shadow: 0 0 0 2px var(--focus-soft);')],
   ['Quick Switch selected candidate has a location cue', navigation.includes('box-shadow: inset 2px 0 0 var(--focus-color);')],
   ['metadata trigger has visible keyboard focus', metadata.includes('.item-metadata-trigger:focus-visible') && metadata.includes('outline: 2px solid var(--focus-color);')],
+  ['link metadata keeps shared keyboard focus', metadata.includes('.row.has-link-metadata .item-metadata-trigger.is-link:focus-visible') && metadata.includes('background: var(--focus-soft);')],
+  ['plain metadata keeps shared keyboard focus without link accent', metadata.includes('.row.has-plain-metadata .item-metadata-trigger.is-plain:focus-visible')],
   ['metadata links have visible keyboard focus', metadata.includes('.item-metadata-link:focus-visible')],
   ['metadata edit control has visible keyboard focus', metadata.includes('.item-metadata-edit-btn:focus-visible')],
   ['metadata editor uses shared focus color', metadata.includes('.item-metadata-editor:focus') && metadata.includes('border-color: var(--focus-color);')],
   ['metadata focus does not suppress outlines', !metadata.includes('focus-visible {\n  background: var(--surface-hover);\n  color: var(--text-color);\n  outline: none;')],
-  ['single URL gets an explicit count cue', metadata.includes('.item-metadata-trigger:not(:has(.item-metadata-count))::after') && metadata.includes('content: "1";')],
-  ['URL-only row reserves room for link presence', metadata.includes('.row.has-compact-metadata .input-wrapper') && metadata.includes('padding-right: 62px;')],
-  ['URL-only row actions remain visible at rest', /\.row\.has-compact-metadata \.row-actions\s*\{[\s\S]*?opacity:\s*1;[\s\S]*?\}/.test(metadata)],
-  ['completion action stays quiet beside persistent link presence', /\.row\.has-compact-metadata \.action-icon\.check\s*\{[\s\S]*?opacity:\s*\.24;[\s\S]*?\}/.test(metadata)],
+  ['single URL gets an explicit count cue only on link metadata', metadata.includes('.item-metadata-trigger.is-link:not(:has(.item-metadata-count))::after') && metadata.includes('content: "1";')],
+  ['metadata row reserves room for presence indicator', metadata.includes('.row.has-compact-metadata .input-wrapper') && metadata.includes('padding-right: 62px;')],
+  ['metadata row actions remain visible at rest', /\.row\.has-compact-metadata \.row-actions\s*\{[\s\S]*?opacity:\s*1;[\s\S]*?\}/.test(metadata)],
+  ['completion action stays quiet beside persistent metadata presence', /\.row\.has-compact-metadata \.action-icon\.check\s*\{[\s\S]*?opacity:\s*\.24;[\s\S]*?\}/.test(metadata)],
 ];
 
 for (const [name, ok] of checks) {
