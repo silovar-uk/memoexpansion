@@ -21,7 +21,7 @@
   --selected-bg: #f2f2ee;
   --selection-mark: #44443f;
   --focus-color: #66869a;
-  --focus-soft: rgba(74, 111, 134, .055);
+  --focus-soft: rgba(74, 111, 134, .045);
   --chrome-surface: #f1f6f9;
   --chrome-surface-strong: #eaf2f6;
   --chrome-border: #d8e5ec;
@@ -60,6 +60,7 @@ header { padding: 4px 10px; }
   transition: background-color .11s ease, opacity .2s ease;
 }
 .row:hover:not(.selected) { background: #fafaf8; }
+.row:focus-within:not(.selected) { background: var(--focus-soft); }
 
 /* Selection is neutral and quiet: no blue wash or blue perimeter. */
 .row.selected {
@@ -209,8 +210,7 @@ button:focus-visible,
 .item-note:focus-visible {
   outline: none;
   box-shadow: inset 0 -1px 0 var(--focus-color);
-  background: var(--focus-soft);
-  border-radius: 2px 2px 0 0;
+  border-radius: 0;
 }
 
 /* Touch remains comfortably targetable without making desktop controls bulky. */
