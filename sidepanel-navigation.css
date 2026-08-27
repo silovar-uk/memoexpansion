@@ -25,8 +25,8 @@
   overflow: hidden;
   background: rgba(255,255,253,.98);
   border: 1px solid var(--border-color);
-  border-radius: 7px;
-  box-shadow: 0 12px 30px rgba(35,35,32,.12);
+  border-radius: 6px;
+  box-shadow: 0 10px 24px rgba(35,35,32,.10);
 }
 
 #tab-switcher-input {
@@ -45,8 +45,8 @@
 }
 
 #tab-switcher-input:focus {
-  border-color: #8e8e87;
-  box-shadow: 0 0 0 2px rgba(85,85,79,.08);
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 2px var(--focus-soft);
 }
 
 #tab-switcher-list {
@@ -71,9 +71,13 @@
   text-align: left;
 }
 
-.tab-switcher-item:hover,
+.tab-switcher-item:hover {
+  background: var(--surface-hover);
+}
+
 .tab-switcher-item.selected {
   background: var(--surface-hover);
+  box-shadow: inset 2px 0 0 var(--focus-color);
 }
 
 .tab-switcher-title {
