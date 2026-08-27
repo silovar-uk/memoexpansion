@@ -26,6 +26,7 @@ jobs:
           node --check recovery-state.js
           node --check save-state.js
           node --check tab-navigation-core.js
+          node --check note-metadata-core.js
           node --check sidepanel.js
           node --check sidepanel-tabs.js
           node --check sidepanel-render.js
@@ -40,6 +41,7 @@ jobs:
           node --check sidepanel-accessibility.js
           node --check sidepanel-shell.js
           node --check sidepanel-navigation.js
+          node --check sidepanel-metadata.js
           node --check tests/ui-shell-contract.test.js
           node --check tests/save-state.test.js
           node --check tests/save-contract.test.js
@@ -56,6 +58,7 @@ jobs:
           node --check tests/recovery-flow.test.js
           node --check tests/version-coherence.test.js
           node --check tests/outliner-structure.test.js
+          node --check tests/note-metadata.test.js
 
       - name: Run structure characterization tests
         run: node tests/outliner-structure.test.js
@@ -95,6 +98,9 @@ jobs:
           node tests/recovery-contract.test.js
           node tests/recovery-flow.test.js
 
+      - name: Run compact metadata test
+        run: node tests/note-metadata.test.js
+
       - name: Run version coherence test
         run: node tests/version-coherence.test.js
 
@@ -113,6 +119,7 @@ jobs:
             recovery-state.js \
             save-state.js \
             tab-navigation-core.js \
+            note-metadata-core.js \
             sidepanel.html \
             sidepanel.js \
             sidepanel-tabs.js \
@@ -136,6 +143,8 @@ jobs:
             sidepanel-editor.css \
             sidepanel-components.css \
             sidepanel-maintenance.css \
+            sidepanel-metadata.css \
+            sidepanel-metadata.js \
             README_UPDATE.md \
             icons
 
