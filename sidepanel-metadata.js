@@ -6,7 +6,7 @@
   const originalRenderEditor = window.renderEditor;
   const originalHandleKey = window.handleKey;
   let activeMetadataPopup = null;
-  let outsidePointerHandler = null;
+  let outsideClickHandler = null;
 
   function findActiveItem(itemId) {
     const currentTab = tabs.find(tab => tab.id === activeTabId);
@@ -17,9 +17,9 @@
   }
 
   function cleanupOutsideHandler() {
-    if (!outsidePointerHandler) return;
-    document.removeEventListener('pointerdown', outsidePointerHandler, true);
-    outsidePointerHandler = null;
+    if (!outsideClickHandler) return;
+    document.removeEventListener('click', outsideClickHandler);
+    outsideClickHandler = null;
   }
 
   function removeMetadataPopup({ restoreFocus = false, itemId = null } = {}) {
@@ -41,11 +41,11 @@
   function installOutsideClose(popup, onClose) {
     cleanupOutsideHandler();
     setTimeout(() => {
-      outsidePointerHandler = (event) => {
+      outsideClickHandler = (event) => {
         if (!popup.isConnected || popup.contains(event.target)) return;
         onClose();
       };
-      document.addEventListener('pointerdown', outsidePointerHandler, true);
+      document.addEventListener('click', outsideClickHandler);
     }, 0);
   }
 
@@ -111,6 +111,12 @@
     });
     popup.appendChild(editButton);
 
+    popup.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      removeMetadataPopup({ restoreFocus: true, itemId });
+    });
+
     installOutsideClose(popup, () => removeMetadataPopup());
     requestAnimationFrame(() => editButton.focus({ preventScroll: true }));
   }
@@ -119,6 +125,7 @@
     const found = findActiveItem(itemId);
     if (!found) return;
     const { item } = found;
+    const tabIdAtOpen = activeTabId;
     const popup = createPopupShell(itemId, anchor);
     popup.classList.add('is-editing');
     popup.setAttribute('aria-label', '詳細を編集');
@@ -155,13 +162,15 @@
       markAsDirty();
     }
 
-    function commitAndClose() {
+    function commitAndClose({ rerender = true, restoreFocus = true } = {}) {
       applyDraft();
-      const shouldRender = changed || originalNote !== item.note;
+      const shouldRender = rerender && (changed || originalNote !== item.note) && activeTabId === tabIdAtOpen;
       removeMetadataPopup();
       if (changed) saveData();
       if (shouldRender) renderEditor();
-      requestAnimationFrame(() => focusItemById(itemId));
+      if (restoreFocus && activeTabId === tabIdAtOpen) {
+        requestAnimationFrame(() => focusItemById(itemId));
+      }
     }
 
     textarea.addEventListener('input', applyDraft);
@@ -182,7 +191,10 @@
       }
     });
 
-    installOutsideClose(popup, commitAndClose);
+    installOutsideClose(popup, () => commitAndClose({
+      rerender: activeTabId === tabIdAtOpen,
+      restoreFocus: false
+    }));
     requestAnimationFrame(() => {
       textarea.focus({ preventScroll: true });
       textarea.setSelectionRange(textarea.value.length, textarea.value.length);
