@@ -48,11 +48,15 @@
 .tab-utility-group .control-btn,
 .tab-utility-group #new-tab-btn {
   width: 24px; height: 24px; min-width: 24px; margin: 0; padding: 0;
-  border: 0; border-radius: 4px; background: transparent; color: var(--text-muted);
+  border: 0; border-radius: 4px; background: transparent; color: var(--text-faint);
 }
 .tab-utility-group .control-btn:hover,
 .tab-utility-group #new-tab-btn:hover {
   background: var(--chrome-surface-strong); color: var(--text-color); border-color: transparent;
+}
+.tab-utility-group .control-btn:focus-visible,
+.tab-utility-group #new-tab-btn:focus-visible {
+  background: var(--focus-soft); color: var(--text-color); border-color: transparent;
 }
 .new-tab-wrapper { position: relative; flex-shrink: 0; margin: 0; padding: 0; z-index: 60; }
 #new-tab-btn { font-weight: 400; }
