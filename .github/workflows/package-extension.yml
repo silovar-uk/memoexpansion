@@ -59,6 +59,7 @@ jobs:
           node --check tests/version-coherence.test.js
           node --check tests/outliner-structure.test.js
           node --check tests/note-metadata.test.js
+          node --check tests/focus-visual-contract.test.js
 
       - name: Run structure characterization tests
         run: node tests/outliner-structure.test.js
@@ -100,6 +101,9 @@ jobs:
 
       - name: Run compact metadata test
         run: node tests/note-metadata.test.js
+
+      - name: Run quiet focus visual contract test
+        run: node tests/focus-visual-contract.test.js
 
       - name: Run version coherence test
         run: node tests/version-coherence.test.js
