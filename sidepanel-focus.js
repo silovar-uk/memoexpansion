@@ -195,9 +195,9 @@
     if (typeof originalCreateNewTab === 'function' && !originalCreateNewTab.__memoContinuityWrapped) {
       const wrappedCreateNewTab = function wrappedCreateNewTab(mode) {
         writeCurrentFocusNow().catch(() => {});
-        const result = originalCreateNewTab.apply(this, arguments);
-        scheduleMemoFocus();
-        return result;
+        // New memo focus is owned by the inline tab-title editor.
+        // Do not race that title-first handoff with editor restoration.
+        return originalCreateNewTab.apply(this, arguments);
       };
       wrappedCreateNewTab.__memoContinuityWrapped = true;
       window.createNewTab = wrappedCreateNewTab;
