@@ -8,11 +8,11 @@ Updated: **2026-08-26**
 - `background.js`: Side Panel/action/context-menu integration, instance coordination and `Alt+A` open/close/focus handshake.
 - `sidepanel.html`: explicit script/style composition; no wrapper/bootstrap layer. The persistent top surface is the tab-first Quiet Shell.
 - `sidepanel.js`: app state, load/save lifecycle, history, completed-archive adapter and initialization.
-- `outliner-structure.js`: DOM-free structural invariants for active/completed ordering, subtree boundaries and child detection.
+- `outliner-structure.js`: DOM-free structural invariants for active/completed ordering, active-row fallback, subtree boundaries and child detection.
 - `recovery-state.js`: DOM-free storage-load classification and active-tab recovery decisions.
 - `save-state.js`: DOM-free save snapshot identity (`tabs + activeTabId`) and stale-write detection.
 - `tab-navigation-core.js`: DOM-free tab-title normalization, filtering and result-index movement for Quick Switch.
-- `sidepanel-tabs.js`: tab lifecycle and tab UI mechanics. Switching active tabs is a persisted state change.
+- `sidepanel-tabs.js`: tab lifecycle and tab UI mechanics. Switching active tabs is a persisted state change; newly created tabs own the inline title-first handoff before editor focus.
 - `sidepanel-render.js`: editor rendering.
 - `sidepanel-input.js`: editing and keyboard structure operations.
 - `sidepanel-meta.js`: completion, star sorting and item metadata operations.
@@ -56,7 +56,8 @@ This keeps Quick Switch reversible and prevents a convenience feature from becom
 Interaction Precision is organized around one rule: feature owners perform the action; `sidepanel-focus.js` preserves editing context around actions that replace the editor DOM.
 
 - Before `switchTab()` or `createNewTab()` replaces the editor DOM, MemoFocus snapshots the outgoing memo's caret state and vertical scroll position when available.
-- After the transition, MemoFocus restores the incoming/new memo's remembered target and scroll position or uses the existing fallback editing target.
+- After a normal tab switch, MemoFocus restores the incoming memo's remembered target and scroll position or uses the existing fallback editing target.
+- After new-memo creation, `sidepanel-tabs.js` focuses the inline title editor first; keyboard confirmation then delegates the handoff into the memo through MemoFocus. Pointer blur never forces that handoff.
 - Text Mode scroll continuity belongs to the textarea; Outliner scroll continuity belongs to `#editor`.
 - `sidepanel-navigation.js` must not add its own changed-tab focus sequence; it delegates changed tabs to `switchTab()` and only directly focuses when the chosen result is already active.
 - `sidepanel-ui.js` owns the new-tab mode menu's menu semantics, keyboard traversal and Escape focus return because those are menu interaction concerns, not tab CRUD.
@@ -104,7 +105,8 @@ The Shell is intentionally smaller than the application:
 - Persistent shell presentation: `sidepanel-shell.css/js` + static shell contract test.
 - Quick Switch presentation: `sidepanel-navigation.css/js` + navigation contract test.
 - Failure-only storage recovery: `sidepanel-recovery.js/css` + recovery contract test.
-- Cross-tab/new-tab focus and vertical-scroll continuity: `sidepanel-focus.js` + Interaction Precision contract test.
+- Cross-tab focus, outgoing new-tab context capture and vertical-scroll continuity: `sidepanel-focus.js` + Interaction Precision contract test.
+- New-tab title-first focus and keyboard handoff: `sidepanel-tabs.js` + Interaction Precision contract test.
 - New-tab menu open/close/keyboard continuity: `sidepanel-ui.js` + Interaction Precision contract test.
 - DOM rendering: renderer/UI modules.
 - Save/state ownership: global dirty state in `sidepanel.js`, mutation declaration at the owning feature, serialized persistence in `sidepanel-runtime.js`.
