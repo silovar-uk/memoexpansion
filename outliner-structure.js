@@ -28,6 +28,22 @@
     return true;
   }
 
+  function ensureActiveItem(items, createFallback) {
+    if (!Array.isArray(items)) return false;
+    if (items.some(item => !item?.completed)) return false;
+
+    const fallback = typeof createFallback === 'function'
+      ? createFallback()
+      : createFallback;
+    if (!fallback || typeof fallback !== 'object') return false;
+
+    fallback.completed = false;
+    const firstCompletedIndex = items.findIndex(item => item?.completed);
+    const insertAt = firstCompletedIndex === -1 ? items.length : firstCompletedIndex;
+    items.splice(insertAt, 0, fallback);
+    return true;
+  }
+
   function getSubtreeCount(items, index) {
     const target = Array.isArray(items) ? items[index] : null;
     if (!target || target.completed) return 0;
@@ -70,6 +86,7 @@
 
   return Object.freeze({
     archiveCompletedItems,
+    ensureActiveItem,
     getSubtreeCount,
     hasActiveChildren,
     isCompletedArchiveNormalized
