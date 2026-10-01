@@ -21,9 +21,8 @@ function completeItem(index) {
   const delay = animationApplied ? 300 : 0;
   setTimeout(() => {
     for (let i = 0; i < count; i++) currentTab.items[index + i].completed = true;
-    const visibleItems = currentTab.items.filter(i => !i.completed);
-    if (visibleItems.length === 0) currentTab.items.push(createOutlinerItem());
     archiveCompletedItems(currentTab);
+    window.MemoOutlinerStructure.ensureActiveItem(currentTab.items, createOutlinerItem);
     markAsDirty(); 
     renderEditor(); 
     editor.scrollTop = scrollPos;
