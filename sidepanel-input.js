@@ -103,8 +103,8 @@ function deleteSelectedItems() {
   for (let i = currentTab.items.length - 1; i >= 0; i--) {
     if (selectedItemIds.has(currentTab.items[i].id)) currentTab.items.splice(i, 1);
   }
-  const visibleItems = currentTab.items.filter(i => !i.completed);
-  if (visibleItems.length === 0) currentTab.items.push(createOutlinerItem());
+  window.MemoOutlinerStructure.ensureActiveItem(currentTab.items, createOutlinerItem);
+  archiveCompletedItems(currentTab);
   selectedItemIds.clear(); markAsDirty(); saveData(); renderEditor();
 }
 
@@ -228,7 +228,8 @@ function handleKey(e, index, item) {
     renderEditor(); saveData(); setTimeout(() => focusItemById(newItem.id, 0), 0);
   } else if (e.key === 'Backspace') {
     const currentTab = tabs.find(t => t.id === activeTabId);
-    if (item.text === '' && currentTab.items.length > 1) {
+    const activeItemCount = currentTab.items.filter(i => !i.completed).length;
+    if (item.text === '' && activeItemCount > 1) {
       e.preventDefault(); pushHistory();
       let prevId = null;
       for (let i = index - 1; i >= 0; i--) { if (!currentTab.items[i].completed) { prevId = currentTab.items[i].id; break; } }

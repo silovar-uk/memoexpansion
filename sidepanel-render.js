@@ -5,7 +5,13 @@ const OUTLINER_MAX_VISUAL_INDENT = 100;
 function renderEditor() {
   const editor = document.getElementById('editor');
   const currentTab = tabs.find(t => t.id === activeTabId);
-  if (currentTab?.mode === 'outliner' && archiveCompletedItems(currentTab)) markAsDirty();
+  if (currentTab?.mode === 'outliner') {
+    let structureChanged = archiveCompletedItems(currentTab);
+    if (window.MemoOutlinerStructure.ensureActiveItem(currentTab.items, createOutlinerItem)) {
+      structureChanged = true;
+    }
+    if (structureChanged) markAsDirty();
+  }
   if (!currentTab) {
     editor.innerHTML = '';
     editor.classList.remove('line-numbers-visible');
@@ -212,6 +218,7 @@ function renderEditor() {
     input.rows = 1;
     input.wrap = 'off';
     input.placeholder = (currentTab.items.filter(i => !i.completed).length === 1 && item.text === '') ? 'ここに入力...' : '';
+    input.setAttribute('aria-label', 'アウトライナー項目');
     input.spellcheck = false;
     
     if (item.textColor) input.classList.add(`text-${item.textColor}`);

@@ -47,7 +47,9 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - Text Mode restores the textarea's vertical scroll position; Outliner restores the `#editor` vertical scroll position.
 - Interaction continuity state remains in the existing `chrome.storage.session` caret map. v2.4.4 adds no `chrome.storage.local` key and no persistent navigation history.
 - After switching to a different tab, focus returns to that tab's remembered editing target or the established fallback target.
-- After creating a new memo, focus moves into that memo's writing/editing surface so the next action can be typing.
+- After creating a new memo, focus first moves into the inline tab-title editor with the generated title selected.
+- Enter or Tab commits that new title and moves focus into the memo's writing/editing surface; Escape restores the generated title and then moves into the memo.
+- Pointer-driven blur commits the title without stealing focus back from the destination the user clicked.
 - New-tab mode choices expose menu/menuitem semantics for keyboard use.
 - When the new-tab menu is opened from keyboard activation, focus enters the first mode choice; Arrow Up/Down moves between choices and Enter/Space activates the choice.
 - Escape closes the new-tab menu and returns focus to the new-tab trigger.
@@ -89,7 +91,7 @@ Invariants:
 - Folding eligibility is determined from active descendants only.
 - Moving a parent up/down moves its active subtree as one block.
 - Completing a parent completes its subtree using the existing completion flow.
-- If completion leaves no active rows, the existing empty-row fallback remains available.
+- If any deletion or completion path leaves no active rows, exactly one empty active row is restored before the completed archive so the editor returns to its initial quiet placeholder state.
 - Star sorting applies to the active tree; completed items remain in the completed archive.
 
 Pure structural ownership lives in `outliner-structure.js`.
@@ -109,7 +111,7 @@ Pure structural ownership lives in `outliner-structure.js`.
 - Multi-selection remains available through the current pointer interaction.
 - Selection commands remain `解除` and `移動` in the current UI.
 - Keyboard focus must remain visibly identifiable even though the visual language is neutral rather than blue.
-- `sidepanel-focus.js` owns session-only caret and vertical-scroll continuity across tab/new-memo transitions and shortcut restoration.
+- `sidepanel-focus.js` owns session-only caret and vertical-scroll continuity across tab transitions, outgoing new-memo context capture and shortcut restoration; `sidepanel-tabs.js` owns the title-first handoff for a newly created memo.
 
 ## Undo / redo
 
