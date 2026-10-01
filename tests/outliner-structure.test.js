@@ -17,6 +17,27 @@ test('completed items are stably archived after active items', () => {
   assert.equal(Structure.isCompletedArchiveNormalized(items), true);
 });
 
+test('zero-active state gets one fallback row before the completed archive', () => {
+  const items = [row('done-1', 0, true), row('done-2', 1, true)];
+  assert.equal(Structure.ensureActiveItem(items, () => row('empty')), true);
+  assert.deepEqual(items.map(item => item.id), ['empty', 'done-1', 'done-2']);
+  assert.equal(items.filter(item => !item.completed).length, 1);
+});
+
+test('existing active rows prevent duplicate fallback creation', () => {
+  const items = [row('A'), row('done', 0, true)];
+  assert.equal(Structure.ensureActiveItem(items, () => row('empty')), false);
+  assert.deepEqual(items.map(item => item.id), ['A', 'done']);
+});
+
+test('empty item array gets exactly one active fallback', () => {
+  const items = [];
+  assert.equal(Structure.ensureActiveItem(items, () => row('empty')), true);
+  assert.deepEqual(items.map(item => item.id), ['empty']);
+  assert.equal(Structure.ensureActiveItem(items, () => row('second-empty')), false);
+  assert.deepEqual(items.map(item => item.id), ['empty']);
+});
+
 test('subtree count includes active descendants but stops before next sibling', () => {
   const items = [row('A', 0), row('B', 1), row('C', 2), row('D', 1), row('E', 0), row('done', 2, true)];
   assert.equal(Structure.getSubtreeCount(items, 0), 4);
