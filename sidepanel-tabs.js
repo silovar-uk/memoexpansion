@@ -24,6 +24,9 @@ function createNewTab(mode = 'outliner') {
   saveData();
   renderTabs();
   renderEditor();
+  requestAnimationFrame(() => {
+    startTabRename(newTab.id, { selectAll: true, focusMemoOnCommit: true });
+  });
 }
 
 function switchTab(tabId) {
@@ -46,6 +49,75 @@ function renameTab(tabId, newTitle) {
     saveData();
     renderTabs();
   }
+}
+
+function startTabRename(tabId, { selectAll = false, focusMemoOnCommit = false } = {}) {
+  const tab = tabs.find(t => t.id === tabId);
+  if (!tab) return false;
+
+  const div = Array.from(document.querySelectorAll('.tab'))
+    .find(element => element.dataset.tabId === tabId);
+  if (!div || div.querySelector('input')) return false;
+
+  const titleSpan = div.querySelector('.tab-title');
+  const closeBtn = div.querySelector('.close-tab-btn');
+  if (!titleSpan || !closeBtn) return false;
+
+  const originalTitle = tab.title;
+  let finished = false;
+
+  div.draggable = false;
+  titleSpan.style.display = 'none';
+
+  const input = document.createElement('input');
+  input.value = tab.title;
+  input.setAttribute('aria-label', `${tab.title}の名前`);
+  input.onclick = (event) => event.stopPropagation();
+
+  const moveFocusToMemo = () => {
+    if (!focusMemoOnCommit) return;
+    requestAnimationFrame(() => window.MemoFocus?.focusCurrentMemo());
+  };
+
+  const finishRename = ({ restoreOriginal = false, moveToMemo = false } = {}) => {
+    if (finished) return;
+    finished = true;
+
+    const newValue = restoreOriginal
+      ? originalTitle
+      : (input.value.trim() || '名称未設定');
+
+    if (newValue !== tab.title) {
+      renameTab(tab.id, newValue);
+    } else {
+      input.remove();
+      titleSpan.style.display = '';
+      div.draggable = true;
+    }
+
+    if (moveToMemo) moveFocusToMemo();
+  };
+
+  input.onblur = () => finishRename();
+  input.onkeydown = (event) => {
+    if (event.key === 'Enter' || (focusMemoOnCommit && event.key === 'Tab')) {
+      event.preventDefault();
+      finishRename({ moveToMemo: focusMemoOnCommit });
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      finishRename({ restoreOriginal: true, moveToMemo: focusMemoOnCommit });
+    }
+  };
+
+  div.insertBefore(input, closeBtn);
+  input.focus({ preventScroll: true });
+  if (selectAll) {
+    input.select();
+  } else {
+    const end = input.value.length;
+    input.setSelectionRange(end, end);
+  }
+  return true;
 }
 
 function deleteTab(tabId) {
@@ -143,33 +215,7 @@ function renderTabs() {
     
     div.ondblclick = (e) => {
       e.stopPropagation();
-      if (div.querySelector('input')) return;
-
-      div.draggable = false;
-      titleSpan.style.display = 'none';
-      
-      const input = document.createElement('input');
-      input.value = tab.title;
-      input.onclick = (ev) => ev.stopPropagation();
-      
-      const finishRename = () => {
-        const newVal = input.value.trim() || '名称未設定';
-        if (newVal !== tab.title) {
-          renameTab(tab.id, newVal);
-        } else {
-          input.remove();
-          titleSpan.style.display = '';
-        }
-        div.draggable = true;
-      };
-
-      input.onblur = finishRename;
-      input.onkeydown = (ev) => {
-        if(ev.key === 'Enter') input.blur();
-      };
-      
-      div.insertBefore(input, closeBtn);
-      input.focus();
+      startTabRename(tab.id);
     };
 
     container.appendChild(div);
