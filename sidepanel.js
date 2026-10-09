@@ -34,7 +34,7 @@ let lineJumpTimer = null;
 const LINE_JUMP_DELAY = 650;
 
 // --- アウトライナー本文の1行フィット表示 ---
-const OUTLINER_EDIT_FONT_SIZE = 14;
+// Editing font size is owned by MemoTypography; default remains 14px.
 const OUTLINER_PREFERRED_MIN_FONT_SIZE = 10.5;
 const OUTLINER_ABSOLUTE_MIN_FONT_SIZE = 10;
 let outlinerFitFrame = null;
