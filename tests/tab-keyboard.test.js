@@ -1,0 +1,33 @@
+'use strict';
+const assert = require('node:assert/strict');
+const nav = require('../tab-navigation-core.js');
+const tabs = Array.from({ length: 12 }, (_, index) => ({ id: String(index + 1) }));
+let count = 0;
+function check(label, actual, expected) {
+  assert.deepEqual(actual, expected, label);
+  count++;
+}
+check('digit 1', nav.tabIndexForNumberKey('1', 'Digit1', tabs.length), 0);
+check('digit 9', nav.tabIndexForNumberKey('9', 'Digit9', tabs.length), 8);
+check('digit 0 unused', nav.tabIndexForNumberKey('0', 'Digit0', tabs.length), -1);
+check('no Numpad auto handling', nav.tabIndexForNumberKey('1', 'Numpad1', tabs.length), -1);
+check('invalid numeric key', nav.tabIndexForNumberKey('a', 'KeyA', tabs.length), -1);
+check('out of range tab', nav.tabIndexForNumberKey('9', 'Digit9', 3), -1);
+check('no tabs', nav.tabIndexForNumberKey('1', 'Digit1', 0), -1);
+check('right moves', nav.tabIndexForNavigationKey(1, 3, 'ArrowRight'), 2);
+check('left moves', nav.tabIndexForNavigationKey(1, 3, 'ArrowLeft'), 0);
+check('right wraps', nav.tabIndexForNavigationKey(2, 3, 'ArrowRight'), 0);
+check('left wraps', nav.tabIndexForNavigationKey(0, 3, 'ArrowLeft'), 2);
+check('Home moves first', nav.tabIndexForNavigationKey(2, 3, 'Home'), 0);
+check('End moves last', nav.tabIndexForNavigationKey(0, 3, 'End'), 2);
+check('no shortcuts for unrelated keys', nav.tabIndexForNavigationKey(0, 3, 'PageUp'), -1);
+check('no move for empty', nav.tabIndexForNavigationKey(0, 0, 'Home'), -1);
+const right = nav.reorderTab(tabs, 1, 1);
+check('reorder right moved', right.moved, true);
+check('reorder preserves identity', right.tabs[2], tabs[1]);
+check('reorder changes original order', tabs[1].id, '2');
+check('reorder updates index', right.index, 2);
+check('reorder beyond end not moved', nav.reorderTab(tabs, 11, 1).moved, false);
+check('reorder before start not moved', nav.reorderTab(tabs, 0, -1).moved, false);
+check('invalid index not moved', nav.reorderTab(tabs, -1, 1).moved, false);
+console.log('tab-keyboard.test.js: ' + count + '/' + count + ' passed');
