@@ -52,6 +52,7 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - While a tab itself is focused, Ctrl+Shift+Left/Right moves that tab one position without touching the editor DOM and persists the tab order.
 - Empty tablists, first/last reorder boundaries, 10+ tabs, IME composition and numeric keys in a focused editor do not trigger unintended moves.
 - Quick Switch shows original ordinal positions, even when its results are filtered. Tab positions 10+ have no digit shortcut.
+- Once a different tab has been visited, Quick Switch offers a contextual “return to previous memo” button. This state is memory-only and uses the existing switchTab path.
 - The active tab is not changed merely by arrow-key navigation; its selected state remains separate from keyboard focus.
 
 ## Interaction Precision
