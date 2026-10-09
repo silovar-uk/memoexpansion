@@ -43,6 +43,17 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - `tab-navigation-core.js` owns DOM-free title normalization/filtering and result-index movement.
 - `sidepanel-navigation.js` owns the temporary switcher UI only; it does not own tab CRUD or persistence.
 
+## Focus-scoped tab navigation (v2.7.0)
+
+- Each tab displays its ordinal position, calculated at render time from the existing tab order. The number is never stored in its title or metadata.
+- While a tab itself has keyboard focus, digits 1–9 activate the corresponding ordinal tab; digits are never intercepted in editable memo text, rename input, search input or other controls.
+- Alt+Q and Alt+1–9 remain reserved for the user's Quick Links; Chrome Ctrl+digit shortcuts are not intercepted.
+- While a tab itself is focused, Left/Right and Home/End move **keyboard focus only** (manual activation); Enter or Space opens the focused memo using the existing switch and focus-continuity paths.
+- While a tab itself is focused, Ctrl+Shift+Left/Right moves that tab one position without touching the editor DOM and persists the tab order.
+- Empty tablists, first/last reorder boundaries, 10+ tabs, IME composition and numeric keys in a focused editor do not trigger unintended moves.
+- Quick Switch shows original ordinal positions, even when its results are filtered. Tab positions 10+ have no digit shortcut.
+- The active tab is not changed merely by arrow-key navigation; its selected state remains separate from keyboard focus.
+
 ## Interaction Precision
 
 - Before an actual tab switch or new-tab creation replaces the editor DOM, MemoFocus captures the current memo's caret context and current vertical scroll position when available.
