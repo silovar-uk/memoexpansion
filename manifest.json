@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "文字サイズと折り返し表示を調整でき、データ異常時の上書きを防ぐMemoTool。",
   "permissions": [
     "sidePanel",
