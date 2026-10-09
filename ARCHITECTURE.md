@@ -1,7 +1,7 @@
 # MemoTool — Architecture Baseline
 
-Baseline: **v2.5.0**  
-Updated: **2026-08-26**
+Baseline: **v2.6.0**  
+Updated: **2026-10-09**
 
 ## Runtime composition
 
@@ -115,3 +115,12 @@ The Shell is intentionally smaller than the application:
 - Do not place feature logic in the Shell merely because its control is visible there.
 - Do not add persisted navigation history until a real repeated-navigation problem justifies it.
 - Do not add recovery storage layers until a concrete data-loss scenario requires them.
+
+## Typography v2.6.0
+
+- `typography-core.js`: pure 12–28px size preferences and compact/wrapped layout normalization.
+- `sidepanel-typography.js/css`: an on-demand footer Aa dialog. The independent `chrome.storage.local.memoViewPreferences` key stores presentation without writing memo `tabs` or marking content dirty.
+- `sidepanel-input.js`: Outliner compact width-fit remains the default; optional wrapping respects the requested font size and grows row height.
+- `sidepanel-editor.css` and `sidepanel-metadata.css` own variable-driven body/detail font presentation.
+- Preference changes resize existing textarea nodes without re-rendering them, preserving caret and IME composition. Open panels synchronize through `storage.onChanged`.
+- `tests/typography-core.test.js` and `tests/typography-contract.test.js` cover numeric, layout and persistence boundaries.
