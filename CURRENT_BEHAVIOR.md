@@ -30,7 +30,9 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 
 ## Navigation Confidence
 
-- The tab-search button and `Alt+Q` open the same Quick Switch surface inside the Side Panel.
+- Reserve all `Alt+digit` combinations for the user's other Quick Links. Do not add them as MemoTool navigation shortcuts.
+
+- The tab-search button opens Quick Switch inside the Side Panel. `Alt+Q` is not bound in MemoTool: it is reserved for another extension.
 - Quick Switch searches existing tab titles using normalized substring matching; it does not use fuzzy ranking, AI search or usage history.
 - Empty-query results preserve the existing tab order.
 - When opening with an empty query, the current tab is selected if present.

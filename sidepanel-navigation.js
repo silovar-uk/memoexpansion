@@ -121,11 +121,6 @@
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.altKey && !event.ctrlKey && !event.metaKey && event.key.toLowerCase() === 'q') {
-      event.preventDefault();
-      isOpen() ? closeSwitcher() : openSwitcher();
-      return;
-    }
     if (event.key === 'Escape' && isOpen() && document.activeElement !== input) {
       closeSwitcher();
     }

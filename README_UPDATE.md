@@ -1,3 +1,12 @@
+# MemoTool v2.6.1 — Shortcut Coexistence
+
+## 2026/10/09
+
+- 他のQuick Links拡張との競合を避けるため、MemoToolの `Alt+Q` タブ検索ショートカットを解除
+- 上部の検索ボタンからは従来どおりQuick Switchを使用可能
+- `Alt+1〜9` はMemoToolへ追加しない（他のQuick Links向けに予約）
+- ナビゲーション契約テストで `Alt+Q` の再導入を防止
+
 # MemoTool v2.6.0 — Readable Typography
 
 ## 2026/10/09

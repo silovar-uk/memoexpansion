@@ -1,6 +1,6 @@
 # MemoTool — Architecture Baseline
 
-Baseline: **v2.6.0**  
+Baseline: **v2.6.1**  
 Updated: **2026-10-09**
 
 ## Runtime composition
@@ -124,3 +124,9 @@ The Shell is intentionally smaller than the application:
 - `sidepanel-editor.css` and `sidepanel-metadata.css` own variable-driven body/detail font presentation.
 - Preference changes resize existing textarea nodes without re-rendering them, preserving caret and IME composition. Open panels synchronize through `storage.onChanged`.
 - `tests/typography-core.test.js` and `tests/typography-contract.test.js` cover numeric, layout and persistence boundaries.
+
+## Shortcut coexistence v2.6.1
+
+- Quick Switch stays available through its header search button, but the document-level Alt+Q handler is removed to avoid the user's other Quick Links extension.
+- Alt+digits are reserved for the other extension. No new MemoTool tab-navigation shortcut is introduced by this patch.
+- Future tab navigation should use focus-scoped tablist keyboard behavior and must not overwrite browser or other extension shortcuts.

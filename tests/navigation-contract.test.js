@@ -13,7 +13,7 @@ const checks = [
   ['navigation core loaded', /tab-navigation-core\.js/.test(html)],
   ['navigation UI loaded', /sidepanel-navigation\.js/.test(html)],
   ['navigation CSS loaded', /sidepanel-navigation\.css/.test(html)],
-  ['Alt+Q opens switcher', /event\.altKey[\s\S]*key\.toLowerCase\(\) === 'q'/.test(ui)],
+  ['Alt+Q remains unbound for Quick Links', !/event\.altKey[\s\S]*key\.toLowerCase\(\) === 'q'/.test(ui) && !html.includes('Alt+Q')],
   ['existing switchTab is reused', /switchTab\(tab\.id\)/.test(ui)],
   ['no new storage writes', !/chrome\.storage/.test(ui)],
   ['switcher hidden contract', /\.tab-switcher\[hidden\]/.test(css)],
