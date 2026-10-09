@@ -139,3 +139,5 @@ The Shell is intentionally smaller than the application:
 - `sidepanel-tabs.js` renders numbers from positions without altering stored tab IDs/titles. The existing `switchTab` and `MemoFocus` perform activation/focus restoration.
 - Keyboard tab reordering persists via the established dirty/save path and renders only the tab strip, leaving memo editors mounted.
 - `tests/tab-keyboard.test.js` covers pure navigation boundaries and `tests/tab-keyboard-contract.test.js` guards keyboard scope, compatibility and packaging.
+
+- Quick Switch may show a session-only previous-tab return action. The tracked previous ID lives in sidepanel-navigation.js and is updated by the owning tab switch/new-tab code; there is no new persisted history or global shortcut.
