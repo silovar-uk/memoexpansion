@@ -1,0 +1,16 @@
+'use strict';
+const assert = require('node:assert/strict');
+const t = require('../typography-core.js');
+assert.deepEqual(t.normalize(), { fontSize: 14, outlinerLayout: 'compact' });
+assert.deepEqual(t.normalize({ fontSize: 28, outlinerLayout: 'wrap' }), { fontSize: 28, outlinerLayout: 'wrap' });
+assert.equal(t.normalize({ fontSize: -99 }).fontSize, 12);
+assert.equal(t.normalize({ fontSize: 999 }).fontSize, 28);
+assert.equal(t.normalize({ fontSize: '18' }).fontSize, 14);
+assert.equal(t.normalize({ fontSize: NaN }).fontSize, 14);
+assert.equal(t.normalize({ fontSize: 13 }).fontSize, 14);
+assert.equal(t.normalize({ fontSize: 24, outlinerLayout: 'broken' }).outlinerLayout, 'compact');
+assert.equal(t.adjust({ fontSize: 14 }, 2).fontSize, 16);
+assert.equal(t.adjust({ fontSize: 28 }, 2).fontSize, 28);
+assert.equal(t.adjust({ fontSize: 12 }, -2).fontSize, 12);
+assert.equal(t.DEFAULT.fontSize, 14);
+console.log('typography-core.test.js: 12/12 passed');

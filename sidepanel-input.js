@@ -1,55 +1,88 @@
-// --- アウトライナー専用ヘルパー ---
+// --- Outliner text sizing and width-aware layout ---
+
+function getOutlinerTypography() {
+  const preferences = window.MemoTypography?.getPreferences();
+  const fontSize = preferences?.fontSize ?? 14;
+  return {
+    fontSize,
+    lineHeight: Math.max(24, Math.ceil(fontSize * 1.55)),
+    wrap: preferences?.outlinerLayout === 'wrap'
+  };
+}
 
 function setOutlinerInputEditingState(input) {
   if (!input || !input.classList.contains('item-input')) return;
-
-  input.style.fontSize = `${OUTLINER_EDIT_FONT_SIZE}px`;
-  input.style.height = '24px';
-  input.style.minHeight = '24px';
-  input.dataset.fittedFontSize = String(OUTLINER_EDIT_FONT_SIZE);
+  const typography = getOutlinerTypography();
+  input.wrap = typography.wrap ? 'soft' : 'off';
+  input.style.fontSize = typography.fontSize + 'px';
+  input.style.lineHeight = typography.lineHeight + 'px';
+  input.style.minHeight = typography.lineHeight + 'px';
+  if (typography.wrap) {
+    input.style.height = 'auto';
+    input.style.height = Math.max(typography.lineHeight, input.scrollHeight) + 'px';
+  } else {
+    input.style.height = typography.lineHeight + 'px';
+  }
+  input.dataset.fittedFontSize = String(typography.fontSize);
   input.removeAttribute('title');
 }
 
 function updateOutlinerInputTooltip(input, fittedSize) {
-  if (input.value && fittedSize < OUTLINER_PREFERRED_MIN_FONT_SIZE) input.title = input.value;
-  else input.removeAttribute('title');
+  if (input.value && (fittedSize < OUTLINER_PREFERRED_MIN_FONT_SIZE || input.scrollWidth > input.clientWidth + 1)) {
+    input.title = input.value;
+  } else {
+    input.removeAttribute('title');
+  }
 }
 
 function fitOutlinerInput(input) {
   if (!input || !input.classList.contains('item-input')) return;
-  input.style.height = '24px';
-  input.style.minHeight = '24px';
+  const typography = getOutlinerTypography();
+  input.wrap = typography.wrap ? 'soft' : 'off';
+  input.style.fontSize = typography.fontSize + 'px';
+  input.style.lineHeight = typography.lineHeight + 'px';
+  input.style.minHeight = typography.lineHeight + 'px';
   input.scrollLeft = 0;
+
+  // Wrap mode honors the configured font size and expands to fit visual lines.
+  if (typography.wrap) {
+    input.style.height = 'auto';
+    input.style.height = Math.max(typography.lineHeight, input.scrollHeight) + 'px';
+    input.dataset.fittedFontSize = String(typography.fontSize);
+    input.removeAttribute('title');
+    return;
+  }
+
+  input.style.height = typography.lineHeight + 'px';
   if (document.activeElement === input) {
     setOutlinerInputEditingState(input);
     return;
   }
-  input.style.fontSize = `${OUTLINER_EDIT_FONT_SIZE}px`;
   if (!input.value || input.clientWidth <= 0) {
-    input.dataset.fittedFontSize = String(OUTLINER_EDIT_FONT_SIZE);
-    updateOutlinerInputTooltip(input, OUTLINER_EDIT_FONT_SIZE);
+    input.dataset.fittedFontSize = String(typography.fontSize);
+    updateOutlinerInputTooltip(input, typography.fontSize);
     return;
   }
   const fits = () => input.scrollWidth <= input.clientWidth + 1;
   if (fits()) {
-    input.dataset.fittedFontSize = String(OUTLINER_EDIT_FONT_SIZE);
-    updateOutlinerInputTooltip(input, OUTLINER_EDIT_FONT_SIZE);
+    input.dataset.fittedFontSize = String(typography.fontSize);
+    updateOutlinerInputTooltip(input, typography.fontSize);
     return;
   }
   let low = OUTLINER_ABSOLUTE_MIN_FONT_SIZE;
-  let high = OUTLINER_EDIT_FONT_SIZE;
+  let high = typography.fontSize;
   for (let i = 0; i < 18; i++) {
     const mid = (low + high) / 2;
-    input.style.fontSize = `${mid}px`;
+    input.style.fontSize = mid + 'px';
     if (fits()) low = mid;
     else high = mid;
   }
   let fittedSize = Math.max(OUTLINER_ABSOLUTE_MIN_FONT_SIZE, low - 0.02);
-  input.style.fontSize = `${fittedSize.toFixed(2)}px`;
+  input.style.fontSize = fittedSize.toFixed(2) + 'px';
   for (let i = 0; i < 4 && !fits(); i++) {
     const ratio = input.clientWidth / Math.max(input.scrollWidth, 1);
     fittedSize = Math.max(OUTLINER_ABSOLUTE_MIN_FONT_SIZE, fittedSize * ratio * 0.98);
-    input.style.fontSize = `${fittedSize.toFixed(3)}px`;
+    input.style.fontSize = fittedSize.toFixed(3) + 'px';
   }
   input.dataset.fittedFontSize = String(fittedSize);
   updateOutlinerInputTooltip(input, fittedSize);
@@ -57,7 +90,8 @@ function fitOutlinerInput(input) {
 
 function fitAllOutlinerInputs() {
   document.querySelectorAll('.item-input').forEach(input => {
-    if (document.activeElement !== input) fitOutlinerInput(input);
+    if (document.activeElement === input) setOutlinerInputEditingState(input);
+    else fitOutlinerInput(input);
   });
 }
 
