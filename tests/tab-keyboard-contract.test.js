@@ -22,6 +22,9 @@ const checks = [
   ['reorder reuses persistence and does not render editor', keyboard.includes('markAsDirty()') && keyboard.includes('saveData()') && keyboard.includes('renderTabs()') && !keyboard.includes('renderEditor(')],
   ['reorder keeps focus on moved tab', keyboard.includes('focusTabAt(result.index)')],
   ['search result number remains original order', navigation.includes("tabs.indexOf(tab) + 1")],
+  ['recent tab remains session only', navigation.includes('let previousTabId = null') && navigation.includes('window.MemoRecentTabs') && !navigation.includes('chrome.storage')],
+  ['recent return has an accessible contextual control', html.includes('id="tab-switcher-recent"') && navigation.includes('recentButton?.addEventListener') && tabs.includes('window.MemoRecentTabs?.remember')],
+  ['recent return does not bypass focus continuity', navigation.includes('switchTab(tab.id)') && !navigation.includes('renderEditor(')],
   ['tab toolbar owns additional style', html.includes('sidepanel-tab-keyboard.css') && css.includes('.tab-position')],
   ['tab keyboard loaded after navigation core', html.indexOf('tab-navigation-core.js') < html.indexOf('sidepanel-tab-keyboard.js')],
   ['Alt+Q and Alt+digits remain unbound', !/event\.altKey[\s\S]*key\.toLowerCase\(\) === 'q'/.test(navigation) && !keyboard.includes("event.altKey &&") && !Object.keys(manifest.commands || {}).some(k => /tab|quick/i.test(k))]
