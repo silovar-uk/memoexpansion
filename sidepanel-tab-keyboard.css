@@ -1,0 +1,36 @@
+/* Numbered tabs: small position labels, without modifying memo titles or data. */
+#tab-list .tab {
+  gap: 5px;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+.tab-position {
+  display: inline-block;
+  flex-shrink: 0;
+  min-width: 10px;
+  color: var(--text-faint);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  pointer-events: none;
+}
+.tab.active .tab-position { color: var(--text-muted); }
+#tab-list .tab:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: -2px;
+  background: var(--focus-soft);
+}
+.tab-switcher-number {
+  min-width: 19px;
+  flex-shrink: 0;
+  color: var(--text-faint);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+@media (max-width: 330px) {
+  #tab-list .tab { gap: 3px; padding-left: 5px; padding-right: 5px; }
+  .tab-position { min-width: 9px; }
+}
