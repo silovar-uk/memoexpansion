@@ -42,8 +42,8 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     word-break: normal;
-    font-size: 14px;
-    line-height: 1.72;
+    font-size: var(--memo-font-size, 14px);
+     line-height: 1.72;
     font-family: inherit;
     color: var(--text-color);
     caret-color: #62625c;
@@ -143,14 +143,13 @@
 
   .item-input {
     width: 100%; background: transparent; border: none; outline: none;
-    font-size: 14px; line-height: 24px; color: inherit; font-family: inherit;
-    resize: none; padding: 0; margin: 0; min-height: 24px; height: 24px;
+    font-size: var(--memo-font-size, 14px); line-height: var(--memo-outliner-line-height, 24px); color: inherit; font-family: inherit;
+    resize: none; padding: 0; margin: 0; min-height: var(--memo-outliner-line-height, 24px); height: var(--memo-outliner-line-height, 24px);
     overflow-x: hidden; overflow-y: hidden; display: block;
     white-space: pre; word-break: normal; box-sizing: border-box;
     border-radius: 2px;
   }
   .item-input:focus {
-    font-size: 14px !important;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -159,11 +158,19 @@
 
   .item-note {
     width: 100%; background: transparent; border: none; outline: none;
-    font-size: 12px; line-height: 1.4; color: #78716c; font-family: inherit;
+    font-size: var(--memo-note-font-size, 12px); line-height: 1.4; color: #78716c; font-family: inherit;
     resize: none; padding: 0; margin-top: 2px; display: block; height: auto;
     overflow: hidden;
   }
   .item-note.hidden { display: none; }
+
+  :root[data-memo-layout="wrap"] .item-input {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+    overflow-y: hidden;
+  }
+  :root[data-memo-layout="wrap"] .item-input:focus { overflow-x: hidden; }
 
   .note-link-container {
     display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px;
