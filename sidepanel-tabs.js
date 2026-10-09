@@ -147,7 +147,7 @@ function renderTabs() {
   
   container.innerHTML = '';
 
-  tabs.forEach(tab => {
+  tabs.forEach((tab, index) => {
     const div = document.createElement('div');
     div.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
     div.setAttribute('role', 'tab');
@@ -156,7 +156,10 @@ function renderTabs() {
     if (tab.bgColor) {
       div.classList.add(`tab-bg-${tab.bgColor}`);
     }
-    div.title = tab.title;
+    const position = index + 1;
+    const shortcutHelp = position <= 9 ? ` · タブ列で${position}キーで開く` : ' · 検索で開く';
+    div.title = `${position}. ${tab.title}${shortcutHelp}`;
+    div.setAttribute('aria-label', `${position}番: ${tab.title}`);
     
     div.draggable = true;
     div.dataset.tabId = tab.id;
@@ -172,6 +175,12 @@ function renderTabs() {
       e.stopPropagation();
       showTabContextMenu(e.pageX, e.pageY, tab.id);
     });
+
+    const number = document.createElement('span');
+    number.className = 'tab-position';
+    number.setAttribute('aria-hidden', 'true');
+    number.textContent = String(index + 1);
+    div.appendChild(number);
 
     const titleSpan = document.createElement('span');
     titleSpan.className = 'tab-title';
@@ -209,7 +218,8 @@ function renderTabs() {
       if (e.target !== div) return;
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        activateTab();
+        if (tab.id === activeTabId) window.MemoFocus?.focusCurrentMemo();
+        else activateTab();
       }
     };
     
