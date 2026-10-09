@@ -17,6 +17,7 @@ function createNewTab(mode = 'outliner') {
     createdAt: Date.now()
   };
   
+  window.MemoRecentTabs?.remember(activeTabId, newTab.id);
   tabs.push(newTab);
   activeTabId = newTab.id;
   selectedItemIds.clear(); 
@@ -31,6 +32,7 @@ function createNewTab(mode = 'outliner') {
 
 function switchTab(tabId) {
   if (tabId === activeTabId) return;
+  window.MemoRecentTabs?.remember(activeTabId, tabId);
   activeTabId = tabId;
   selectedItemIds.clear();
   markAsDirty();
