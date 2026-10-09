@@ -117,7 +117,7 @@
   border-radius: 3px;
   background: var(--surface-subtle);
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: var(--memo-note-font-size, 12px);
   line-height: 1.45;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -189,7 +189,7 @@
   background: var(--surface);
   color: var(--text-color);
   font-family: inherit;
-  font-size: 12px;
+  font-size: var(--memo-note-font-size, 12px);
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
