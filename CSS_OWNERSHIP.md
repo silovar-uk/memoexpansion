@@ -1,7 +1,7 @@
 # MemoTool — CSS Ownership Map
 
-Baseline: **v2.5.0**  
-Updated: **2026-08-26**
+Baseline: **v2.6.0**  
+Updated: **2026-10-09**
 
 The UI is split by responsibility. A selector should have one long-term owner. `sidepanel-maintenance.css` remains a refinement/migration layer, not a permanent dumping ground.
 
@@ -146,3 +146,10 @@ Rules:
 3. consolidate remaining line-number refinements into `sidepanel-components.css`;
 4. remove dead header/status CSS after confirming no runtime dependency;
 5. only after ownership is stable, perform a separate Micro Interaction Polish pass for hover/reveal/timing behavior.
+
+## v2.6.0 Typography owner
+
+- `sidepanel-typography.css` owns only the footer Aa trigger and transient display-settings panel.
+- `sidepanel-editor.css` owns body text font variables, line-height and outliner compact/wrapped layout.
+- `sidepanel-metadata.css` owns detail note text sizing driven by the display preference.
+- Footer layout remains owned by `sidepanel-components.css`. Persistent top shell remains unchanged.
