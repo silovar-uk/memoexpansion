@@ -1,6 +1,6 @@
 # MemoTool — CSS Ownership Map
 
-Baseline: **v2.6.1**  
+Baseline: **v2.7.0**  
 Updated: **2026-10-09**
 
 The UI is split by responsibility. A selector should have one long-term owner. `sidepanel-maintenance.css` remains a refinement/migration layer, not a permanent dumping ground.
@@ -153,3 +153,9 @@ Rules:
 - `sidepanel-editor.css` owns body text font variables, line-height and outliner compact/wrapped layout.
 - `sidepanel-metadata.css` owns detail note text sizing driven by the display preference.
 - Footer layout remains owned by `sidepanel-components.css`. Persistent top shell remains unchanged.
+
+## v2.7.0 keyboard tab affordances
+
+- `sidepanel-tab-keyboard.css` owns ordinal badge sizing, the tablist's keyboard focus state, and the original-order number in Quick Switch.
+- `sidepanel-shell.css` still owns overall top chrome height, active visual state and responsive tab geometry.
+- `sidepanel-navigation.css` continues to own Quick Switch panel geometry, input and selection states.

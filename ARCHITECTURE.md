@@ -1,6 +1,6 @@
 # MemoTool — Architecture Baseline
 
-Baseline: **v2.6.1**  
+Baseline: **v2.7.0**  
 Updated: **2026-10-09**
 
 ## Runtime composition
@@ -130,3 +130,14 @@ The Shell is intentionally smaller than the application:
 - Quick Switch stays available through its header search button, but the document-level Alt+Q handler is removed to avoid the user's other Quick Links extension.
 - Alt+digits are reserved for the other extension. No new MemoTool tab-navigation shortcut is introduced by this patch.
 - Future tab navigation should use focus-scoped tablist keyboard behavior and must not overwrite browser or other extension shortcuts.
+
+## Focus-scoped tab navigation v2.7.0
+
+- `tab-navigation-core.js` owns pure digit lookup, roving focus navigation and immutable tab-order movement.
+- `sidepanel-tab-keyboard.js` delegates keyboard events from the tablist, with explicit IME and modifier guards. No document-wide shortcuts and no new Chrome commands are registered.
+- `sidepanel-tab-keyboard.css` owns only ordinal badges, keyboard focus cue and Quick Switch ordinal labels; tab shell still owns top chrome.
+- `sidepanel-tabs.js` renders numbers from positions without altering stored tab IDs/titles. The existing `switchTab` and `MemoFocus` perform activation/focus restoration.
+- Keyboard tab reordering persists via the established dirty/save path and renders only the tab strip, leaving memo editors mounted.
+- `tests/tab-keyboard.test.js` covers pure navigation boundaries and `tests/tab-keyboard-contract.test.js` guards keyboard scope, compatibility and packaging.
+
+- Quick Switch may show a session-only previous-tab return action. The tracked previous ID lives in sidepanel-navigation.js and is updated by the owning tab switch/new-tab code; there is no new persisted history or global shortcut.

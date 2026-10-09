@@ -117,3 +117,24 @@
 @media (pointer: coarse) {
   .tab-switcher-item { min-height: 40px; }
 }
+
+/* Contextual return is shown only after a different tab was actually used. */
+.tab-switcher-recent {
+  box-sizing: border-box;
+  width: calc(100% - 16px);
+  min-height: 30px;
+  margin: 0 8px 6px;
+  padding: 6px 9px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--surface-subtle);
+  color: var(--text-muted);
+  font-size: 11px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tab-switcher-recent[hidden] { display: none !important; }
+.tab-switcher-recent:hover { background: var(--surface-hover); color: var(--text-color); }
+.tab-switcher-recent:focus-visible { outline: 2px solid var(--focus-color); outline-offset: 1px; }

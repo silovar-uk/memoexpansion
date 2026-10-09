@@ -11,6 +11,30 @@
   let results = [];
   let selectedIndex = -1;
   let previousFocus = null;
+  let previousTabId = null;
+  const recentButton = document.getElementById('tab-switcher-recent');
+
+  // Session-only reverse navigation. No new storage schema, browser shortcut or history list.
+  window.MemoRecentTabs = {
+    remember(fromId, toId) {
+      if (fromId && fromId !== toId) previousTabId = fromId;
+    }
+  };
+
+  function previousTab() {
+    return tabs.find(tab => tab.id === previousTabId) || null;
+  }
+
+  function updateRecentButton() {
+    if (!recentButton) return;
+    const tab = previousTab();
+    const canReturn = Boolean(tab && tab.id !== activeTabId);
+    recentButton.hidden = !canReturn;
+    if (canReturn) {
+      recentButton.textContent = '↩ 直前のメモ: ' + (tab.title || '名称未設定');
+      recentButton.title = tab.title || '名称未設定';
+    }
+  }
 
   function isOpen() {
     return !switcher.hidden;
@@ -46,6 +70,12 @@
       item.dataset.tabId = tab.id;
       item.setAttribute('role', 'option');
       item.setAttribute('aria-selected', 'false');
+
+      const number = document.createElement('span');
+      number.className = 'tab-switcher-number';
+      number.textContent = String(tabs.indexOf(tab) + 1);
+      number.setAttribute('aria-hidden', 'true');
+      item.appendChild(number);
 
       const title = document.createElement('span');
       title.className = 'tab-switcher-title';
@@ -86,6 +116,7 @@
     button.setAttribute('aria-expanded', 'true');
     input.value = '';
     renderResults();
+    updateRecentButton();
     requestAnimationFrame(() => input.focus());
   }
 
@@ -99,6 +130,13 @@
       requestAnimationFrame(() => window.MemoFocus?.focusCurrentMemo());
     }
   }
+
+  recentButton?.addEventListener('click', () => {
+    const tab = previousTab();
+    if (!tab || tab.id === activeTabId) return;
+    closeSwitcher({ restoreFocus: false });
+    switchTab(tab.id);
+  });
 
   button.addEventListener('click', () => isOpen() ? closeSwitcher() : openSwitcher());
   input.addEventListener('input', renderResults);
