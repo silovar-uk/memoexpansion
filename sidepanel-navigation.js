@@ -47,6 +47,12 @@
       item.setAttribute('role', 'option');
       item.setAttribute('aria-selected', 'false');
 
+      const number = document.createElement('span');
+      number.className = 'tab-switcher-number';
+      number.textContent = String(tabs.indexOf(tab) + 1);
+      number.setAttribute('aria-hidden', 'true');
+      item.appendChild(number);
+
       const title = document.createElement('span');
       title.className = 'tab-switcher-title';
       title.textContent = tab.title || '名称未設定';
