@@ -1,7 +1,7 @@
 # MemoTool — Architecture Baseline
 
-Baseline: **v2.7.0**  
-Updated: **2026-10-09**
+Baseline: **v2.7.1**  
+Updated: **2026-10-10**
 
 ## Runtime composition
 
@@ -141,3 +141,10 @@ The Shell is intentionally smaller than the application:
 - `tests/tab-keyboard.test.js` covers pure navigation boundaries and `tests/tab-keyboard-contract.test.js` guards keyboard scope, compatibility and packaging.
 
 - Quick Switch may show a session-only previous-tab return action. The tracked previous ID lives in sidepanel-navigation.js and is updated by the owning tab switch/new-tab code; there is no new persisted history or global shortcut.
+
+## Adjacent navigation v2.7.1
+
+- `sidepanel-adjacent-navigation.js` exclusively owns the `Alt+Shift+ArrowLeft/ArrowRight` panel-scoped hotkey; no new `manifest.commands` entries are needed.
+- It uses the existing pure `tabIndexForNavigationKey()` helper with wraparound and delegates activation to the existing `switchTab()` + `MemoFocus` path.
+- Guard open interactions, tab-title edits, IME composition, repeat, and modifier specificity. Plain Alt+arrows and other extensions' Alt+Q / Alt+digits are never intercepted.
+- `tests/adjacent-tab-shortcut.test.js` exercises keyboard dispatch and no-op/guard cases without real Chrome access.
