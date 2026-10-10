@@ -160,7 +160,7 @@ function renderTabs() {
     }
     const position = index + 1;
     const shortcutHelp = position <= 9 ? ` · タブ列で${position}キーで開く` : ' · 検索で開く';
-    div.title = `${position}. ${tab.title}${shortcutHelp}`;
+    div.title = `${position}. ${tab.title}${shortcutHelp}${tab.id === activeTabId ? ' · Alt+Shift+←/→ 前後のメモ' : ''}`;
     div.setAttribute('aria-label', `${position}番: ${tab.title}`);
     
     div.draggable = true;
