@@ -45,6 +45,7 @@ jobs:
           node --check sidepanel-shell.js
           node --check sidepanel-navigation.js
           node --check sidepanel-tab-keyboard.js
+          node --check sidepanel-adjacent-navigation.js
           node --check sidepanel-metadata.js
           node --check typography-core.js
           node --check sidepanel-typography.js
@@ -57,6 +58,7 @@ jobs:
           node --check tests/tab-navigation.test.js
           node --check tests/tab-keyboard.test.js
           node --check tests/tab-keyboard-behavior.test.js
+          node --check tests/adjacent-tab-shortcut.test.js
           node --check tests/tab-keyboard-contract.test.js
           node --check tests/navigation-contract.test.js
           node --check tests/text-canvas-contract.test.js
@@ -96,6 +98,7 @@ jobs:
           node tests/navigation-contract.test.js
           node tests/tab-keyboard.test.js
           node tests/tab-keyboard-behavior.test.js
+          node tests/adjacent-tab-shortcut.test.js
           node tests/tab-keyboard-contract.test.js
 
       - name: Run text canvas contract test
@@ -164,6 +167,7 @@ jobs:
             sidepanel-navigation.css \
             sidepanel-navigation.js \
             sidepanel-tab-keyboard.js \
+            sidepanel-adjacent-navigation.js \
             sidepanel-tab-keyboard.css \
             sidepanel-recovery.css \
             sidepanel-base.css \
@@ -183,12 +187,12 @@ jobs:
         run: |
           unzip -t memoexpansion-extension.zip
           unzip -Z1 memoexpansion-extension.zip | grep -qx 'manifest.json'
-          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.7.0"
+          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.7.1"
 
       - name: Upload extension ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: memoexpansion-extension-v2.7.0
+          name: memoexpansion-extension-v2.7.1
           path: memoexpansion-extension.zip
           if-no-files-found: error
           retention-days: 30
