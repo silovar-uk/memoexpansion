@@ -1,7 +1,7 @@
 # MemoTool — CSS Ownership Map
 
-Baseline: **v2.7.0**  
-Updated: **2026-10-09**
+Baseline: **v2.7.1**  
+Updated: **2026-10-10**
 
 The UI is split by responsibility. A selector should have one long-term owner. `sidepanel-maintenance.css` remains a refinement/migration layer, not a permanent dumping ground.
 

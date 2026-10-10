@@ -55,6 +55,15 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - Once a different tab has been visited, Quick Switch offers a contextual “return to previous memo” button. This state is memory-only and uses the existing switchTab path.
 - The active tab is not changed merely by arrow-key navigation; its selected state remains separate from keyboard focus.
 
+## Adjacent memo shortcuts (v2.7.1)
+
+- Within the focused MemoTool side panel, Alt+Shift+Left/Right activates the previous/next memo in the existing tab order from either editor mode.
+- Navigation wraps from the first tab to the last and vice versa; one or zero tabs are no-ops.
+- A handled shortcut routes through the existing `switchTab()` and `MemoFocus` continuity path; it does not introduce another save implementation or storage schema.
+- Ignore IME composition (including keyCode 229), repeated keydown activations, and active search, typography, tab-creation, history, or metadata popup controls. Tab rename/contenteditable targets are excluded.
+- Plain Alt+Left/Right remain browser shortcuts. Alt+Q and Alt+digits remain reserved for Quick Links. Ctrl+Shift+Left/Right retains tab reordering when a tab itself is focused.
+- The shortcut only works while the side panel receives keyboard focus; it is not a Chrome-wide extension command.
+
 ## Interaction Precision
 
 - Before an actual tab switch or new-tab creation replaces the editor DOM, MemoFocus captures the current memo's caret context and current vertical scroll position when available.
