@@ -45,6 +45,9 @@ jobs:
           node --check sidepanel-shell.js
           node --check sidepanel-navigation.js
           node --check sidepanel-tab-keyboard.js
+          node --check sidepanel-tab-move.js
+          node --check sidepanel-tab-peek.js
+          node --check tests/tab-move-peek.test.js
           node --check sidepanel-adjacent-navigation.js
           node --check sidepanel-metadata.js
           node --check typography-core.js
@@ -95,6 +98,7 @@ jobs:
       - name: Run navigation confidence tests
         run: |
           node tests/tab-navigation.test.js
+          node tests/tab-move-peek.test.js
           node tests/navigation-contract.test.js
           node tests/tab-keyboard.test.js
           node tests/tab-keyboard-behavior.test.js
@@ -167,6 +171,9 @@ jobs:
             sidepanel-navigation.css \
             sidepanel-navigation.js \
             sidepanel-tab-keyboard.js \
+            sidepanel-tab-move.js \
+            sidepanel-tab-peek.js \
+            sidepanel-tab-actions.css \
             sidepanel-adjacent-navigation.js \
             sidepanel-tab-keyboard.css \
             sidepanel-recovery.css \
@@ -187,12 +194,12 @@ jobs:
         run: |
           unzip -t memoexpansion-extension.zip
           unzip -Z1 memoexpansion-extension.zip | grep -qx 'manifest.json'
-          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.7.1"
+          test "$(unzip -p memoexpansion-extension.zip manifest.json | python -c 'import json,sys; print(json.load(sys.stdin)["version"])')" = "2.8.0"
 
       - name: Upload extension ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: memoexpansion-extension-v2.7.1
+          name: memoexpansion-extension-v2.8.0
           path: memoexpansion-extension.zip
           if-no-files-found: error
           retention-days: 30

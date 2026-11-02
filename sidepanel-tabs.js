@@ -144,6 +144,8 @@ function deleteTab(tabId) {
 // --- レンダリング: タブ ---
 
 function renderTabs() {
+  window.MemoTabPeek?.hide();
+  window.MemoTabMove?.clearPreview();
   const container = document.getElementById('tab-list');
   if (!container) return;
   
@@ -230,6 +232,7 @@ function renderTabs() {
       startTabRename(tab.id);
     };
 
+    window.MemoTabPeek?.attach(div, tab.id);
     container.appendChild(div);
   });
   
@@ -301,6 +304,7 @@ function handleDragEnd(e) {
 // --- タブの右クリックメニュー ---
 function showTabContextMenu(x, y, tabId) {
   closeAllPopups();
+  window.MemoTabPeek?.hide();
   const tab = tabs.find(t => t.id === tabId);
   if (!tab) return;
 
@@ -369,6 +373,7 @@ function showTabContextMenu(x, y, tabId) {
   };
   menu.appendChild(deleteItem);
 
+  window.MemoTabMove?.mountContextEntry(menu, tabId);
   setupPopupClose(menu);
   document.body.appendChild(menu);
 }

@@ -1,7 +1,7 @@
 # MemoTool — Architecture Baseline
 
-Baseline: **v2.7.1**  
-Updated: **2026-10-10**
+Baseline: **v2.8.0**  
+Updated: **2026-11-02**
 
 ## Runtime composition
 
@@ -11,7 +11,9 @@ Updated: **2026-10-10**
 - `outliner-structure.js`: DOM-free structural invariants for active/completed ordering, active-row fallback, subtree boundaries and child detection.
 - `recovery-state.js`: DOM-free storage-load classification and active-tab recovery decisions.
 - `save-state.js`: DOM-free save snapshot identity (`tabs + activeTabId`) and stale-write detection.
-- `tab-navigation-core.js`: DOM-free tab-title normalization, filtering and result-index movement for Quick Switch.
+- `tab-navigation-core.js`: DOM-free tab-title normalization, filtering, result-index movement and absolute tab relocation with destination labels.
+- `sidepanel-tab-move.js`: on-demand context-menu relocation picker, non-mutating insertion preview and short-lived order-only undo. It never switches tabs or renders the editor.
+- `sidepanel-tab-peek.js`: delayed, read-only hover preview derived from existing memo content, without persisting state.
 - `sidepanel-tabs.js`: tab lifecycle and tab UI mechanics. Switching active tabs is a persisted state change; newly created tabs own the inline title-first handoff before editor focus.
 - `sidepanel-render.js`: editor rendering.
 - `sidepanel-input.js`: editing and keyboard structure operations.
