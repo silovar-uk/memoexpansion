@@ -100,6 +100,15 @@ This file is a regression contract. Refactors may reorganize code, but must not 
 - Switching tabs is itself a persisted state change: `activeTabId` must mark the app dirty before a save is scheduled.
 - Tab switching must preserve the outgoing memo's session-only focus/scroll context before rerender and restore the incoming memo context after rerender.
 
+## Absolute tab movement and Quiet Peek (v2.8.0)
+
+- Right-clicking a tab offers an explicit destination picker when two or more tabs exist, labeling positions from the current tab order.
+- Hovering/focusing a destination previews a location marker without mutating the model; selecting it reorders only the existing tab objects and persists through the normal save flow.
+- The active tab, editor DOM, caret and scroll location are not altered by order-only movement.
+- A short-lived undo is allowed only when the tab ID order has not changed since that move. It is separate from the memo content undo history.
+- Tabs can show an unobtrusive, delayed, read-only first-lines preview. Completed outliner entries are excluded.
+- Neither feature introduces storage keys or global shortcuts.
+
 ## Outliner model
 
 The persisted representation is a flat array with `depth`; it is intentionally not a nested tree object.
