@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MemoTool",
-  "version": "2.7.1",
-  "description": "文字サイズと折り返し表示を調整でき、データ異常時の上書きを防ぐMemoTool。",
+  "version": "2.8.0",
+  "description": "タブの位置指定・チラ見、文字表示調整、データ異常時の保護を備えたMemoTool。",
   "permissions": [
     "sidePanel",
     "storage",
