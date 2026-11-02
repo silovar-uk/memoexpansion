@@ -1,9 +1,13 @@
 # MemoTool — CSS Ownership Map
 
-Baseline: **v2.7.1**  
-Updated: **2026-10-10**
+Baseline: **v2.8.0**  
+Updated: **2026-11-02**
 
 The UI is split by responsibility. A selector should have one long-term owner. `sidepanel-maintenance.css` remains a refinement/migration layer, not a permanent dumping ground.
+
+## `sidepanel-tab-actions.css`
+
+Owns the on-demand absolute tab-move picker, insertion marker, reversible move toast, and ephemeral tab hover preview. No persistent header controls or editor styling are introduced.
 
 ## `sidepanel-navigation.css`
 
