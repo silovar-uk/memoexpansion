@@ -93,7 +93,7 @@
     entry.textContent = '↔  移動先を指定  ›';
     entry.setAttribute('aria-label', 'このタブの移動先を指定');
     entry.setAttribute('aria-haspopup', 'true');
-    menu.appendChild(entry);
+    menu.insertBefore(entry, menu.querySelector('.popup-menu-header'));
 
     const initialNodes = Array.from(menu.children);
     function restoreMenu() {
