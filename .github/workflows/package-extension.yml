@@ -45,6 +45,9 @@ jobs:
           node --check sidepanel-shell.js
           node --check sidepanel-navigation.js
           node --check sidepanel-tab-keyboard.js
+          node --check sidepanel-tab-move.js
+          node --check sidepanel-tab-peek.js
+          node --check tests/tab-move-peek.test.js
           node --check sidepanel-adjacent-navigation.js
           node --check sidepanel-metadata.js
           node --check typography-core.js
@@ -95,6 +98,7 @@ jobs:
       - name: Run navigation confidence tests
         run: |
           node tests/tab-navigation.test.js
+          node tests/tab-move-peek.test.js
           node tests/navigation-contract.test.js
           node tests/tab-keyboard.test.js
           node tests/tab-keyboard-behavior.test.js
@@ -166,7 +170,10 @@ jobs:
             sidepanel-shell.js \
             sidepanel-navigation.css \
             sidepanel-navigation.js \
-            sidepanel-tab-keyboard.js \
+            sidepanel-tab-keyboard.js
+            sidepanel-tab-move.js
+            sidepanel-tab-peek.js
+            sidepanel-tab-actions.css \
             sidepanel-adjacent-navigation.js \
             sidepanel-tab-keyboard.css \
             sidepanel-recovery.css \
